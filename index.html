@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos UCSAL Pituaçu - Portal Acadêmico</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- Header -->
+    <header class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="mudarVisao('aluno')">
+                <div class="bg-white text-blue-900 font-bold p-2 rounded-lg text-xl">UCSAL</div>
+                <div>
+                    <h1 class="font-bold text-lg">Eventos & Extensão</h1>
+                    <p class="text-xs text-blue-200">Campus Pituaçu | POO Avançada</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex space-x-2 text-sm font-medium items-center">
+                <button onclick="mudarVisao('aluno')" id="btn-menu-aluno" class="text-blue-200 hover:text-white transition px-3 py-1.5 rounded-lg bg-blue-800">Início</button>
+                <!-- Botões de Login e Cadastro do Aluno (lado a lado) -->
+                <button onclick="mudarVisao('login-aluno')" id="btn-menu-login-aluno" class="text-blue-200 hover:text-white transition px-3 py-1.5 rounded-lg">Login Aluno</button>
+                <a href="#inscricao" onclick="mudarVisao('aluno')" class="bg-emerald-500 hover:bg-emerald-600 text-white transition px-3 py-1.5 rounded-lg text-xs font-bold">Cadastrar</a>
+                <button onclick="mudarVisao('login-admin')" id="btn-menu-admin" class="text-blue-200 hover:text-white transition px-3 py-1.5 rounded-lg border border-blue-700">Área do Gestor</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Visão do Aluno -->
+    <div id="view-aluno">
+        <section class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white py-12 px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <span id="banner-status-aluno" class="bg-blue-800/80 text-blue-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Expositor Acadêmico</span>
+                <h2 class="text-3x1 md:text-4xl font-extrabold mt-3 mb-4 leading-tight">Gestão de Horas Complementares e Eventos da UCSAL</h2>
+                <p class="text-base text-blue-100 mb-6 max-w-2xl mx-auto">Fique por dentro de hackathons, palestras, workshops e muito mais!</p>
+                <a href="#inscricao" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg transition inline-block text-sm">Quero me Cadastrar</a>
+            </div>
+        </section>
+
+        <!-- Lista de Eventos -->
+        <section class="max-w-7xl mx-auto px-4 py-12">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">Próximos Eventos Disponíveis</h3>
+                    <p id="subtitulo-eventos" class="text-xs text-slate-500">Faça login como aluno para ver suas inscrições salvas.</p>
+                </div>
+                <button onclick="atualizarEventosAnimado()" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-lg transition">
+                    <i id="icone-atualizar" class="fa-solid fa-rotate"></i> Atualizar
+                </button>
+            </div>
+
+            <div id="grid-eventos-aluno" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Injetado via JS -->
+            </div>
+        </section>
+
+        <!-- Seção de Inscrição -->
+        <section id="inscricao" class="bg-blue-50/50 py-12 px-4 border-y border-blue-100">
+            <div class="max-w-md mx-auto bg-white p-6 rounded-2xl shadow-sm border border-blue-100">
+                <div class="text-center mb-5">
+                    <h3 class="text-xl font-bold text-slate-900">Receba Alertas de Eventos</h3>
+                    <p class="text-xs text-slate-600 mt-1">Insira seus dados para notificações automáticas.</p>
+                </div>
+                <form id="form-cadastro" onsubmit="enviarCadastro(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome Completo</label>
+                        <input type="text" id="nome" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="Nome Sobrenome">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">E-mail Acadêmico</label>
+                        <input type="email" id="email" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="exemplo@ucsal.edu.br">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Número WhatsApp</label>
+                        <input type="text" id="whatsapp" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="(71) 99999-9999">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-sm text-sm">
+                        Concluir Inscrição
+                    </button>
+                </form>
+                <div id="status-mensagem" class="mt-3 text-center text-xs font-medium"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Visão de login do aluno -->
+    <div id="view-login-aluno" class="hidden max-w-md mx-auto px-4 py-20">
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="inline-block bg-blue-100 text-blue-800 p-3 rounded-2xl mb-2">
+                    <i class="fa-solid fa-user-graduate text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900">Portal do Aluno</h3>
+                <p class="text-xs text-slate-500 mt-1">Informe seu e-mail para carregar suas inscrições.</p>
+            </div>
+            <form onsubmit="fazerLoginAluno(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">E-mail Acadêmico</label>
+                    <input type="email" id="login-aluno-email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="aluno@ucsal.edu.br">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow text-sm">
+                    Acessar Minhas Inscrições
+                </button>
+            </form>
+            <div class="mt-4 text-center">
+                <button onclick="mudarVisao('aluno')" class="text-xs text-blue-600 hover:underline">Voltar para a página inicial</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visão de login ADM -->
+    <div id="view-login-admin" class="hidden max-w-md mx-auto px-4 py-20">
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="inline-block bg-amber-100 text-amber-800 p-3 rounded-2xl mb-2">
+                    <i class="fa-solid fa-lock text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900">Acesso Restrito</h3>
+                <p class="text-xs text-slate-500 mt-1">Credenciais do painel administrativo.</p>
+            </div>
+            <form onsubmit="fazerLoginAdmin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Usuário / E-mail</label>
+                    <input type="text" id="login-user" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="admin@ucsal.br">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Senha</label>
+                    <input type="password" id="login-pass" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition shadow text-sm">
+                    Entrar no Painel
+                </button>
+            </form>
+            <div class="mt-4 text-center">
+                <button onclick="mudarVisao('aluno')" class="text-xs text-blue-600 hover:underline">Voltar para o início</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISÃO DO ADMINISTRADOR -->
+    <div id="view-admin" class="hidden max-w-7xl mx-auto px-4 py-10">
+        <div class="flex justify-between items-center mb-6 bg-slate-900 text-white p-6 rounded-2xl shadow-md">
+            <div>
+                <span class="bg-amber-500 text-slate-950 font-bold text-xs px-2.5 py-1 rounded-md uppercase">Painel Ativo</span>
+                <h2 class="text-2xl font-bold mt-2">Gestão de Eventos UCSAL</h2>
+                <p class="text-xs text-slate-400">Adicione, edite ou remova eventos do sistema.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="abrirModalCriar()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-plus"></i> Novo Evento
+                </button>
+                <button onclick="mudarVisao('aluno')" class="bg-slate-800 hover:bg-slate-700 text-white font-medium px-4 py-2.5 rounded-xl transition text-sm">
+                    Sair
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Eventos Registrados no Sistema</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-xs text-slate-500 uppercase">
+                            <th class="py-3 px-4">Título do Evento</th>
+                            <th class="py-3 px-4">Categoria / Horas</th>
+                            <th class="py-3 px-4">Data e Hora</th>
+                            <th class="py-3 px-4 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-admin-body" class="divide-y divide-slate-100 text-sm">
+                        <!-- Injetado via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de criar / editar -->
+    <div id="modal-evento" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-titulo" class="text-lg font-bold text-slate-900">Adicionar Novo Evento</h3>
+                <button onclick="fecharModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="form-evento-admin" onsubmit="salvarEventoAdmin(event)" class="space-y-3">
+                <input type="hidden" id="evento-id">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nome do Evento</label>
+                    <input type="text" id="adm-titulo" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="Ex: Hackathon de IA">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Categoria</label>
+                        <input type="text" id="adm-categoria" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="Hackathon • 20h">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Data e Hora</label>
+                        <input type="text" id="adm-data" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="15 Out, 14:00">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Descrição</label>
+                    <textarea id="adm-descricao" rows="2" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="Detalhes do evento..."></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="fecharModal()" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-xl text-sm transition shadow">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts e lógica do Front -->
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        let alunoLogado = null; // Guarda o e-mail do aluno logado
+        let inscricoesMemoria = []; // Armazena pares de { email, eventoId }
+
+        let eventosMemoria = [
+            { id: 1, titulo: "I Hackathon de IA Aplicada - Pituaçu", categoria: "Hackathon • 20h Comp.", data: "15 de Outubro, 2026", descricao: "Maratona de programação voltada para criar soluções utilizando inteligência artificial." },
+            { id: 2, titulo: "Arquitetura de Microsserviços e POO", categoria: "Palestra • 4h Comp.", data: "22 de Outubro, 2026", descricao: "Palestra aprofundada sobre como aplicar orientação a objetos em grande escala." }
+        ];
+
+        // Gestão de visões (Telas)
+        function mudarVisao(visao) {
+            const vAluno = document.getElementById('view-aluno');
+            const vLoginAluno = document.getElementById('view-login-aluno');
+            const vLoginAdmin = document.getElementById('view-login-admin');
+            const vAdmin = document.getElementById('view-admin');
+            
+            vAluno.classList.add('hidden');
+            vLoginAluno.classList.add('hidden');
+            vLoginAdmin.classList.add('hidden');
+            vAdmin.classList.add('hidden');
+
+            if (visao === 'aluno') {
+                vAluno.classList.remove('hidden');
+                carregarEventosAluno();
+            } else if (visao === 'login-aluno') {
+                vLoginAluno.classList.remove('hidden');
+            } else if (visao === 'login-admin') {
+                vLoginAdmin.classList.remove('hidden');
+            } else if (visao === 'admin') {
+                vAdmin.classList.remove('hidden');
+                carregarTabelaAdmin();
+            }
+        }
+
+        // Animação básica pro botão de atualizar
+        function atualizarEventosAnimado() {
+            const icone = document.getElementById('icone-atualizar');
+            icone.classList.add('fa-spin');
+            setTimeout(() => {
+                carregarEventosAluno();
+                icone.classList.remove('fa-spin');
+            }, 600);
+        }
+
+        // Login do Aluno
+        function fazerLoginAluno(event) {
+            event.preventDefault();
+            const emailInput = document.getElementById('login-aluno-email').value;
+            alunoLogado = emailInput;
+            
+            document.getElementById('subtitulo-eventos').innerText = `Logado como: ${alunoLogado}. Eventos inscritos destacados.`;
+            document.getElementById('banner-status-aluno').innerText = `Aluno: ${alunoLogado}`;
+            
+            mudarVisao('aluno');
+        }
+
+        // Login do Administrador
+        function fazerLoginAdmin(event) {
+            event.preventDefault();
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+            if(user && pass) {
+                mudarVisao('admin');
+            } else {
+                alert("Preencha as credenciais!");
+            }
+        }
+
+        // Participar de um evento (Aluno logado)
+        function participarEvento(id) {
+            if (!alunoLogado) {
+                alert("Você precisa fazer o login de aluno para registrar sua inscrição!");
+                mudarVisao('login-aluno');
+                return;
+            }
+
+            // Evitar duplicidade
+            const jaInscrito = inscricoesMemoria.some(i => i.email === alunoLogado && i.eventoId === id);
+            if (!jaInscrito) {
+                inscricoesMemoria.push({ email: alunoLogado, eventoId: id });
+            }
+            alert(`Inscrição confirmada para este evento em nome de ${alunoLogado}!`);
+            carregarEventosAluno();
+        }
+
+        // Renderização dinâmica dos eventos para o Aluno (mostrando se já está inscrito ou não)
+        function carregarEventosAluno() {
+            const grid = document.getElementById('grid-eventos-aluno');
+            grid.innerHTML = '';
+
+            eventosMemoria.forEach(evento => {
+                const inscrito = alunoLogado && inscricoesMemoria.some(i => i.email === alunoLogado && i.eventoId === evento.id);
+
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm border ${inscrito ? 'border-emerald-400 ring-2 ring-emerald-50' : 'border-slate-200'} overflow-hidden hover:shadow-md transition">
+                        <div class="${inscrito ? 'bg-emerald-600' : 'bg-blue-600'} text-white px-4 py-2 text-xs font-semibold flex justify-between">
+                            <span>${evento.categoria}</span>
+                            <span><i class="fa-solid fa-calendar"></i> ${evento.data}</span>
+                        </div>
+                        <div class="p-5">
+                            <h4 class="text-base font-bold text-slate-900 mb-2">${evento.titulo}</h4>
+                            <p class="text-slate-600 text-xs mb-4 leading-relaxed">${evento.descricao}</p>
+                            
+                            ${inscrito 
+                                ? '<span class="block text-center bg-emerald-50 text-emerald-700 py-2 rounded-xl text-xs font-bold border border-emerald-200 mb-2"><i class="fa-solid fa-check"></i> Você está inscrito neste evento</span>' 
+                                : ''
+                            }
+
+                            <button onclick="participarEvento(${evento.id})" class="w-full ${inscrito ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'} py-2 rounded-xl text-xs font-bold transition">
+                                ${inscrito ? 'Inscrição Ativa' : 'Participar do Evento'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Tabela do Administrador
+        function carregarTabelaAdmin() {
+            const tbody = document.getElementById('tabela-admin-body');
+            tbody.innerHTML = '';
+
+            eventosMemoria.forEach(evento => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-4 font-semibold text-slate-900">${evento.titulo}</td>
+                        <td class="py-3 px-4 text-slate-600">${evento.categoria}</td>
+                        <td class="py-3 px-4 text-slate-600">${evento.data}</td>
+                        <td class="py-3 px-4 text-right space-x-2">
+                            <button onclick="abrirModalEditar(${evento.id})" class="text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-50 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen"></i> Editar</button>
+                            <button onclick="excluirEvento(${evento.id})" class="text-rose-600 hover:text-rose-800 font-medium text-xs bg-rose-50 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-trash"></i> Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Modais e CRUD
+        function abrirModalCriar() {
+            document.getElementById('modal-titulo').innerText = "Adicionar Novo Evento";
+            document.getElementById('evento-id').value = '';
+            document.getElementById('adm-titulo').value = '';
+            document.getElementById('adm-categoria').value = '';
+            document.getElementById('adm-data').value = '';
+            document.getElementById('adm-descricao').value = '';
+            document.getElementById('modal-evento').classList.remove('hidden');
+        }
+
+        function abrirModalEditar(id) {
+            const evento = eventosMemoria.find(e => e.id === id);
+            if (!evento) return;
+            document.getElementById('modal-titulo').innerText = "Editar Evento";
+            document.getElementById('evento-id').value = evento.id;
+            document.getElementById('adm-titulo').value = evento.titulo;
+            document.getElementById('adm-categoria').value = evento.categoria;
+            document.getElementById('adm-data').value = evento.data;
+            document.getElementById('adm-descricao').value = evento.descricao;
+            document.getElementById('modal-evento').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-evento').classList.add('hidden');
+        }
+
+        function salvarEventoAdmin(event) {
+            event.preventDefault();
+            const id = document.getElementById('evento-id').value;
+            const titulo = document.getElementById('adm-titulo').value;
+            const categoria = document.getElementById('adm-categoria').value;
+            const data = document.getElementById('adm-data').value;
+            const descricao = document.getElementById('adm-descricao').value;
+
+            if (id) {
+                const index = eventosMemoria.findIndex(e => e.id == id);
+                if (index !== -1) eventosMemoria[index] = { id: Number(id), titulo, categoria, data, descricao };
+            } else {
+                const novoId = eventosMemoria.length > 0 ? eventosMemoria[eventosMemoria.length - 1].id + 1 : 1;
+                eventosMemoria.push({ id: novoId, titulo, categoria, data, descricao });
+            }
+
+            fecharModal();
+            carregarTabelaAdmin();
+            alert("Salvo com sucesso!");
+        }
+
+        function excluirEvento(id) {
+            if (confirm("Deseja realmente excluir?")) {
+                eventosMemoria = eventosMemoria.filter(e => e.id !== id);
+                carregarTabelaAdmin();
+            }
+        }
+
+        function enviarCadastro(event) {
+            event.preventDefault();
+            const statusDiv = document.getElementById('status-mensagem');
+            statusDiv.className = "mt-3 text-center text-xs font-medium text-emerald-600";
+            statusDiv.innerText = "Inscrição efetuada com sucesso!";
+            document.getElementById('form-cadastro').reset();
+        }
+
+        window.onload = function() {
+            carregarEventosAluno();
+        };
+    </script>
+</body>
+</html>
