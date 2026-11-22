@@ -35,3 +35,6 @@ build/
 # credenciais locais, nao versionar
 application-local.properties
 src/main/resources/application-local.properties
+
+application-secrets.properties
+src/main/resources/application-secrets.properties

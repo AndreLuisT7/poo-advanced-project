@@ -100,9 +100,29 @@ dados do banco.
 ### Para o envio de e-mail funcionar
 
 O cadastro, a listagem e o portal funcionam sem configurar nada. Para o informativo sair de
-verdade, defina duas variaveis de ambiente antes de subir a aplicacao:
+verdade, preencha as credenciais de uma das duas formas.
 
-Windows (PowerShell):
+**Opcao A — arquivo de segredos (funciona em qualquer perfil)**
+
+Copie o modelo e preencha:
+
+```
+cd poo-advanced-project/src/main/resources
+cp application-secrets.properties.example application-secrets.properties
+```
+
+Abra o arquivo novo e coloque os valores:
+
+```
+spring.mail.username=conta@gmail.com
+spring.mail.password=senha de aplicativo do Gmail
+```
+
+Esse arquivo esta no `.gitignore` e e lido tanto no perfil `demo` quanto no `local`.
+
+**Opcao B — variaveis de ambiente**
+
+Windows (PowerShell), na mesma janela antes de subir a aplicacao:
 
 ```
 $env:MAIL_USERNAME = "conta@gmail.com"
@@ -116,12 +136,13 @@ export MAIL_USERNAME="conta@gmail.com"
 export MAIL_PASSWORD="senha de aplicativo do Gmail"
 ```
 
-Use uma senha de aplicativo do Gmail, nao a senha da conta. Sem essas variaveis a aplicacao
-sobe normalmente e o disparo do informativo responde com a falha de envio no campo `falhas`,
-em vez de quebrar.
+Use uma senha de aplicativo do Gmail, nao a senha da conta. Sem nenhuma das duas opcoes a
+aplicacao sobe normalmente, mas o disparo do informativo responde com a falha no campo
+`falhas` em vez de enviar.
 
-Alternativa: coloque os mesmos valores em `application-local.properties`, que esta no
-`.gitignore`. Use `application-local.properties.example` como modelo.
+> `application-local.properties` guarda a conexao do banco e so e lido quando o perfil `local`
+> esta ativo. Por isso as credenciais de e-mail ficam no arquivo de segredos, que vale para
+> todos os perfis.
 
 ### Usuarios administrativos
 
