@@ -3,6 +3,7 @@ package com.example.poo_advanced_project.controller;
 import com.example.poo_advanced_project.dto.AlunoResponse;
 import com.example.poo_advanced_project.dto.CadastroAlunoRequest;
 import com.example.poo_advanced_project.service.AlunoService;
+import com.example.poo_advanced_project.service.AssinaturaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.net.URI;
 public class AlunoController {
 
     private final AlunoService alunoService;
+    private final AssinaturaService assinaturaService;
 
     @PostMapping
     public ResponseEntity<AlunoResponse> cadastrar(@RequestBody @Valid CadastroAlunoRequest dados) {
@@ -30,6 +32,7 @@ public class AlunoController {
         return ResponseEntity.created(URI.create("/api/alunos/" + aluno.id())).body(aluno);
     }
 
+    // dados pessoais: so a administracao consulta
     @GetMapping("/{id}")
     public AlunoResponse buscarPorId(@PathVariable Long id) {
         return alunoService.buscarPorId(id);
@@ -37,6 +40,6 @@ public class AlunoController {
 
     @PatchMapping("/{id}/assinatura")
     public AlunoResponse alterarAssinatura(@PathVariable Long id, @RequestParam boolean ativa) {
-        return alunoService.alterarAssinatura(id, ativa);
+        return assinaturaService.alterar(id, ativa);
     }
 }

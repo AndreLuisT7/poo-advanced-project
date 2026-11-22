@@ -35,6 +35,7 @@ public class EventoService {
         evento.setLocal(dados.local().trim());
         evento.setDataHora(dados.dataHora());
         evento.setCategoria(dados.categoria().trim());
+        evento.setCargaHoraria(dados.cargaHoraria());
         evento.setInstituicao(instituicao);
 
         return EventoResponse.de(
@@ -44,15 +45,14 @@ public class EventoService {
 
     @Transactional(readOnly = true)
     public List<EventoResponse> listar() {
-        return eventoRepository.findAll().stream()
+        return eventoRepository.buscarTodosComInstituicao().stream()
                 .map(EventoResponse::de)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<EventoResponse> listarProximos() {
-        return eventoRepository.findByDataHoraGreaterThanEqualOrderByDataHoraAsc(LocalDateTime.now())
-                .stream()
+        return eventoRepository.buscarProximos(LocalDateTime.now()).stream()
                 .map(EventoResponse::de)
                 .toList();
     }

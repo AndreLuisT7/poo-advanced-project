@@ -33,6 +33,10 @@ public class Evento {
     @Column(nullable = false, length = 100)
     private String categoria;
 
+    // horas complementares que o evento concede
+    @Column(nullable = false)
+    private Integer cargaHoraria;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "instituicao_id", nullable = false)
     private Instituicao instituicao;

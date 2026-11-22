@@ -2,10 +2,12 @@ package com.example.poo_advanced_project.service.notificacao;
 
 import com.example.poo_advanced_project.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 // adapta o EmailService, que devolve String, ao contrato do Notificador
 @Component
+@Primary
 @RequiredArgsConstructor
 public class NotificadorEmail implements Notificador {
 

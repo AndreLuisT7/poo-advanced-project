@@ -174,8 +174,22 @@
                                 <input type="email" id="email" required autocomplete="email" class="campo" placeholder="exemplo@ucsal.edu.br">
                             </div>
                             <div>
-                                <label for="whatsapp" class="rotulo">Número WhatsApp <span class="font-normal text-slate-400">(opcional)</span></label>
-                                <input type="tel" id="whatsapp" inputmode="tel" autocomplete="tel" class="campo" placeholder="(71) 99999-9999">
+                                <label for="senha" class="rotulo">Senha</label>
+                                <input type="password" id="senha" required minlength="8" autocomplete="new-password" class="campo" placeholder="Minimo 8 caracteres">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="matricula" class="rotulo">Matricula</label>
+                                    <input type="text" id="matricula" required class="campo" placeholder="2023001">
+                                </div>
+                                <div>
+                                    <label for="curso" class="rotulo">Curso</label>
+                                    <input type="text" id="curso" required class="campo" placeholder="Analise e Desenvolvimento">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="instituicao" class="rotulo">Instituicao</label>
+                                <select id="instituicao" required class="campo"></select>
                             </div>
                             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-sm text-sm">
                                 Concluir inscrição
@@ -377,7 +391,7 @@
             BLOQUEIO_SEGUNDOS: 30
         });
 
-        const API_URL = 'http://localhost:3000/api';
+        const API_URL = '/api';
 
         async function gerarHash(texto) {
             if (!window.crypto || !crypto.subtle) throw new Error('crypto.subtle indisponível (use https ou localhost).');
@@ -448,8 +462,13 @@
             return String(valor).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
 
-        function partirCategoria(cat) {
-            const partes = String(cat).split('•');
+        // o back-end manda categoria e cargaHoraria separados; o formato antigo
+        // juntava os dois com "•", entao aceitamos as duas formas
+        function partirCategoria(evOuCat) {
+            if (evOuCat && typeof evOuCat === 'object') {
+                return { tipo: String(evOuCat.categoria || '').trim(), horas: (evOuCat.horas || 0) + 'h Comp.' };
+            }
+            const partes = String(evOuCat).split('•');
             return { tipo: partes[0].trim(), horas: (partes[1] || '').trim() };
         }
 
@@ -462,9 +481,13 @@
             return 'fa-calendar-check';
         }
 
-        function horasNumericas(cat) {
-            const m = partirCategoria(cat).horas.match(/(\d+)\s*h/i);
-            return m ? parseInt(m[1], 10) : 0;
+        function horasNumericas(evOuCat) {
+            if (evOuCat && typeof evOuCat === 'object') {
+                return Number(evOuCat.horas) || 0;
+            }
+            const m = String(evOuCat).split('•')[1] || '';
+            const achado = m.match(/(\d+)\s*h/i);
+            return achado ? parseInt(achado[1], 10) : 0;
         }
 
         function toast(mensagem, tipo = 'ok') {
@@ -528,7 +551,7 @@
 
         /* ---------- Visão do aluno ---------- */
         function cardEvento(ev) {
-            const { tipo, horas } = partirCategoria(ev.categoria);
+            const { tipo, horas } = partirCategoria(ev);
             const inscrito = alunoLogado && inscricoesMemoria.some(i => i.email === alunoLogado && i.eventoId === ev.id);
             return `
             <article class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition p-6 flex flex-col">
@@ -576,7 +599,7 @@
             // Sem eventos: esconde sempre. Com eventos: só aparece no desktop (lg:block).
             box.classList.toggle('lg:block', !!ev);
             if (!ev) return;
-            const { tipo, horas } = partirCategoria(ev.categoria);
+            const { tipo, horas } = partirCategoria(ev);
             $('hero-titulo').textContent = ev.titulo;
             $('hero-descricao').textContent = ev.descricao;
             $('hero-data').textContent = ev.data;
@@ -605,25 +628,87 @@
             }, 700);
         }
 
-        function enviarCadastro(e) {
+        async function enviarCadastro(e) {
             e.preventDefault();
-            const nome = $('nome').value.trim();
-            const email = $('email').value.trim().toLowerCase();
-            const whatsapp = $('whatsapp').value.trim();
             const status = $('status-mensagem');
+            const botao = e.target.querySelector('button[type="submit"]');
+            botao.disabled = true;
 
-            if (alunosMemoria.some(a => a.email === email)) {
-                status.className = 'mt-3 text-center text-sm font-medium text-amber-600';
-                status.textContent = 'Este e-mail já está cadastrado para receber alertas.';
-                return;
+            const corpo = {
+                nomeCompleto: $('nome').value.trim(),
+                email: $('email').value.trim().toLowerCase(),
+                senha: $('senha').value,
+                matricula: $('matricula').value.trim(),
+                curso: $('curso').value.trim(),
+                instituicaoId: Number($('instituicao').value)
+            };
+
+            try {
+                const resposta = await fetch(API_URL + '/alunos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(corpo)
+                });
+                const dados = await resposta.json();
+
+                if (resposta.ok) {
+                    status.className = 'mt-3 text-center text-sm font-medium text-emerald-600';
+                    status.textContent = 'Inscricao concluida! Voce recebera o informativo toda semana.';
+                    toast('Cadastro realizado com sucesso!');
+                    $('form-cadastro').reset();
+                    await carregarInstituicoes();
+                } else {
+                    status.className = 'mt-3 text-center text-sm font-medium text-amber-600';
+                    status.textContent = dados.erro || Object.values(dados).join('. ');
+                }
+            } catch (erro) {
+                status.className = 'mt-3 text-center text-sm font-medium text-red-600';
+                status.textContent = 'Nao foi possivel falar com o servidor. Ele esta rodando?';
+            } finally {
+                botao.disabled = false;
+                setTimeout(() => { status.textContent = ''; }, 6000);
             }
-            alunosMemoria.push({ nome, email, whatsapp });
-            status.className = 'mt-3 text-center text-sm font-medium text-emerald-600';
-            status.textContent = 'Inscrição concluída! Você receberá os próximos alertas.';
-            toast('Cadastro realizado com sucesso!');
-            $('form-cadastro').reset();
-            setTimeout(() => { status.textContent = ''; }, 5000);
         }
+
+        async function carregarInstituicoes() {
+            const select = $('instituicao');
+            if (!select) return;
+            try {
+                const resposta = await fetch(API_URL + '/instituicoes');
+                const lista = await resposta.json();
+                select.innerHTML = lista
+                    .map(i => `<option value="${i.id}">${esc(i.nome)} (${esc(i.sigla)})</option>`)
+                    .join('');
+            } catch (erro) {
+                select.innerHTML = '<option value="">Servidor indisponivel</option>';
+            }
+        }
+
+        async function carregarEventos() {
+            try {
+                const resposta = await fetch(API_URL + '/eventos?proximos=true');
+                if (!resposta.ok) return;
+                eventosMemoria = (await resposta.json()).map(e => ({
+                    id: e.id,
+                    titulo: e.nome,
+                    categoria: e.categoria,
+                    horas: e.cargaHoraria,
+                    data: new Date(e.dataHora).toLocaleString('pt-BR', {
+                        day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    }),
+                    descricao: e.descricao
+                }));
+                renderizarEventosAluno();
+                renderizarDestaque();
+            } catch (erro) {
+                toast('Nao foi possivel carregar os eventos do servidor.', 'erro');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarInstituicoes();
+            carregarEventos();
+        });
 
         function fazerLoginAluno(e) {
             e.preventDefault();
@@ -726,7 +811,7 @@
         function renderizarAdmin() {
             if (!Auth.ativo()) return;
 
-            const totalHoras = eventosMemoria.reduce((s, e) => s + horasNumericas(e.categoria), 0);
+            const totalHoras = eventosMemoria.reduce((s, e) => s + horasNumericas(e), 0);
             const stat = (icone, cor, valor, rotulo) => `
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl ${cor} flex items-center justify-center"><i class="fa-solid ${icone} text-lg"></i></div>
@@ -745,7 +830,7 @@
             }
 
             $('tabela-admin-body').innerHTML = eventosMemoria.map(ev => {
-                const { tipo, horas } = partirCategoria(ev.categoria);
+                const { tipo, horas } = partirCategoria(ev);
                 return `
                 <tr class="hover:bg-slate-50 transition">
                     <td class="py-4 px-4 font-semibold text-slate-900 max-w-xs">${esc(ev.titulo)}</td>
@@ -762,7 +847,7 @@
             }).join('');
 
             $('lista-admin-mobile').innerHTML = eventosMemoria.map(ev => {
-                const { tipo, horas } = partirCategoria(ev.categoria);
+                const { tipo, horas } = partirCategoria(ev);
                 return `
                 <div class="border border-slate-200 rounded-xl p-4">
                     <p class="font-semibold text-slate-900">${esc(ev.titulo)}</p>
