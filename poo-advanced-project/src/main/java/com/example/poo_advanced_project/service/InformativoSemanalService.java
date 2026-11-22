@@ -5,6 +5,7 @@ import com.example.poo_advanced_project.model.Aluno;
 import com.example.poo_advanced_project.model.Evento;
 import com.example.poo_advanced_project.repository.AlunoRepository;
 import com.example.poo_advanced_project.repository.EventoRepository;
+import com.example.poo_advanced_project.service.notificacao.Notificador;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class InformativoSemanalService {
 
     private final AlunoRepository alunoRepository;
     private final EventoRepository eventoRepository;
-    private final EmailService emailService;
+    private final Notificador notificador;
 
     // toda segunda-feira as 8h
     @Scheduled(cron = "0 0 8 * * MON")
@@ -55,15 +56,15 @@ public class InformativoSemanalService {
                 continue;
             }
 
-            String retorno = emailService.enviarEmail(
+            Notificador.Resultado resultado = notificador.enviar(
                     aluno.getEmail(),
                     "Eventos da semana na " + aluno.getInstituicao().getSigla(),
                     montarMensagem(aluno, eventos));
 
-            if (retorno.startsWith("Erro")) {
-                falhas.add(aluno.getEmail() + ": " + retorno);
-            } else {
+            if (resultado.sucesso()) {
                 enviados++;
+            } else {
+                falhas.add(aluno.getEmail() + ": " + resultado.detalhe());
             }
         }
 
