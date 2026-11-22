@@ -5,8 +5,11 @@ import com.example.poo_advanced_project.dto.InstituicaoResponse;
 import com.example.poo_advanced_project.model.Instituicao;
 import com.example.poo_advanced_project.repository.InstituicaoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,5 +28,13 @@ public class InstituicaoService {
         return InstituicaoResponse.de(
                 instituicaoRepository.save(instituicao)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<InstituicaoResponse> listar() {
+        return instituicaoRepository.findAll(Sort.by("nome"))
+                .stream()
+                .map(InstituicaoResponse::de)
+                .toList();
     }
 }

@@ -8,8 +8,11 @@ import com.example.poo_advanced_project.model.Instituicao;
 import com.example.poo_advanced_project.repository.EventoRepository;
 import com.example.poo_advanced_project.repository.InstituicaoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,5 +40,13 @@ public class EventoService {
         return EventoResponse.de(
                 eventoRepository.save(evento)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<EventoResponse> listar() {
+        return eventoRepository.findAll(Sort.by("dataHora"))
+                .stream()
+                .map(EventoResponse::de)
+                .toList();
     }
 }

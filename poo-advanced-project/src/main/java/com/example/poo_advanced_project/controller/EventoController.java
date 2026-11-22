@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/eventos")
@@ -16,6 +17,11 @@ import java.net.URI;
 public class EventoController {
 
     private final EventoService eventoService;
+
+    @GetMapping
+    public List<EventoResponse> listar() {
+        return eventoService.listar();
+    }
 
     @PostMapping
     public ResponseEntity<EventoResponse> cadastrar(
