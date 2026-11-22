@@ -2,6 +2,7 @@ package com.example.poo_advanced_project.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -15,7 +16,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // usuarios
     @Bean
     public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails admin = User.builder()
@@ -40,18 +40,18 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .permitAll()
-                );
-
-        return http.build();
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/api/alunos/**").permitAll()
+                        .requestMatchers("/api/instituicoes/**").permitAll()
+                        .requestMatchers("/api/eventos/**").permitAll()
+                        .requestMatchers("/api/informativo/**").permitAll()
+                        .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .formLogin(Customizer.withDefaults())
+                .logout(logout -> logout.permitAll())
+                .build();
     }
 }

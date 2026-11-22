@@ -1,0 +1,4 @@
+# copie este arquivo como application-local.properties e preencha com os dados do seu neon
+spring.datasource.url=jdbc:postgresql://SEU_HOST.neon.tech/SEU_BANCO?sslmode=require
+spring.datasource.username=SEU_USUARIO
+spring.datasource.password=SUA_SENHA
