@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EventoService {
@@ -37,5 +40,27 @@ public class EventoService {
         return EventoResponse.de(
                 eventoRepository.save(evento)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<EventoResponse> listar() {
+        return eventoRepository.findAll().stream()
+                .map(EventoResponse::de)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<EventoResponse> listarProximos() {
+        return eventoRepository.findByDataHoraGreaterThanEqualOrderByDataHoraAsc(LocalDateTime.now())
+                .stream()
+                .map(EventoResponse::de)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public EventoResponse buscarPorId(Long id) {
+        Evento evento = eventoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Evento " + id + " nao encontrado"));
+        return EventoResponse.de(evento);
     }
 }

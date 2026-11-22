@@ -6,12 +6,14 @@ import com.example.poo_advanced_project.service.InstituicaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/instituicoes")
@@ -29,5 +31,10 @@ public class InstituicaoController {
         return ResponseEntity
                 .created(URI.create("/api/instituicoes/" + instituicao.id()))
                 .body(instituicao);
+    }
+
+    @GetMapping
+    public List<InstituicaoResponse> listar() {
+        return instituicaoService.listar();
     }
 }

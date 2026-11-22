@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/alunos/**").permitAll()
                         .requestMatchers("/api/instituicoes/**").permitAll()
                         .requestMatchers("/api/eventos/**").permitAll()
+                        .requestMatchers("/api/informativo/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())

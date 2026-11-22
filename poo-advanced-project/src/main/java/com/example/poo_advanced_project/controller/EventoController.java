@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/eventos")
@@ -26,5 +27,16 @@ public class EventoController {
         return ResponseEntity
                 .created(URI.create("/api/eventos/" + evento.id()))
                 .body(evento);
+    }
+
+    @GetMapping
+    public List<EventoResponse> listar(
+            @RequestParam(name = "proximos", defaultValue = "false") boolean proximos) {
+        return proximos ? eventoService.listarProximos() : eventoService.listar();
+    }
+
+    @GetMapping("/{id}")
+    public EventoResponse buscarPorId(@PathVariable Long id) {
+        return eventoService.buscarPorId(id);
     }
 }
