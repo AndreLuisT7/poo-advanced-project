@@ -56,17 +56,18 @@ filtrada pela instituicao dele e com a carga horaria de cada evento.
 
 ### Opcao 1 — H2 em memoria (recomendada para avaliacao)
 
-Nao exige nenhuma configuracao. Na raiz do repositorio:
+Um comando, sem configurar nada:
 
 ```
 cd poo-advanced-project
-./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active= --spring.datasource.url=jdbc:h2:mem:portal --spring.datasource.driver-class-name=org.h2.Driver --spring.datasource.username=sa --spring.datasource.password="
+./mvnw spring-boot:run -Dspring-boot.run.profiles=demo
 ```
 
-No Windows, use `mvnw.cmd` no lugar de `./mvnw`.
+No Windows, troque `./mvnw` por `mvnw.cmd`.
 
+O perfil `demo` usa banco H2 em memoria e nao precisa de senha nem de internet para o banco.
 A aplicacao sobe em `http://localhost:8080` e ja cria duas instituicoes e quatro eventos de
-demonstracao automaticamente.
+demonstracao automaticamente. Ao parar a aplicacao os dados somem, entao cada execucao comeca limpa.
 
 ### Opcao 2 — PostgreSQL no Neon
 
@@ -253,7 +254,8 @@ Declarado por honestidade, como pede o manual:
 
 O fluxo principal e: **o aluno se inscreve e passa a receber os eventos da semana por e-mail**.
 
-1. Suba a aplicacao pela Opcao 1. Os dados de demonstracao ja entram sozinhos.
+1. Suba a aplicacao com `./mvnw spring-boot:run -Dspring-boot.run.profiles=demo`. Os dados de
+   demonstracao ja entram sozinhos.
 
 2. Confira os eventos que serao divulgados:
 
