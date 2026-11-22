@@ -56,17 +56,18 @@ filtrada pela instituicao dele e com a carga horaria de cada evento.
 
 ### Opcao 1 — H2 em memoria (recomendada para avaliacao)
 
-Nao exige nenhuma configuracao. Na raiz do repositorio:
+Um comando, sem configurar nada:
 
 ```
 cd poo-advanced-project
-./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active= --spring.datasource.url=jdbc:h2:mem:portal --spring.datasource.driver-class-name=org.h2.Driver --spring.datasource.username=sa --spring.datasource.password="
+./mvnw spring-boot:run -Dspring-boot.run.profiles=demo
 ```
 
-No Windows, use `mvnw.cmd` no lugar de `./mvnw`.
+No Windows, troque `./mvnw` por `mvnw.cmd`.
 
+O perfil `demo` usa banco H2 em memoria e nao precisa de senha nem de internet para o banco.
 A aplicacao sobe em `http://localhost:8080` e ja cria duas instituicoes e quatro eventos de
-demonstracao automaticamente.
+demonstracao automaticamente. Ao parar a aplicacao os dados somem, entao cada execucao comeca limpa.
 
 ### Opcao 2 — PostgreSQL no Neon
 
@@ -112,11 +113,149 @@ Usuarios em memoria, apenas para demonstracao:
 | GET | `/api/eventos/{id}` | Consulta um evento |
 | POST | `/api/informativo/enviar` | Dispara o informativo semanal na hora |
 
+## Arquitetura
+
+A aplicacao segue arquitetura em camadas, cada uma com uma responsabilidade e dependendo
+apenas da camada seguinte:
+
+```
+   HTTP
+     |
+     v
+[ controller ]  traduz HTTP: recebe JSON, valida formato, devolve status
+     |
+     v
+[   service   ]  regra de negocio: e aqui que as decisoes acontecem
+     |
+     v
+[ repository ]  acesso ao banco, sem regra de negocio
+     |
+     v
+[   banco     ]
+```
+
+Duas estruturas atravessam as camadas sem pertencer a nenhuma:
+
+- **`model`** — as entidades JPA (`Aluno`, `Instituicao`, `Evento`), que representam o dominio
+  e as tabelas.
+- **`dto`** — o contrato da API. Sao `record` imutaveis, separados das entidades de proposito:
+  `CadastroAlunoRequest` recebe a senha, `AlunoResponse` nunca a devolve. Se a entidade mudar,
+  o contrato com o front nao quebra junto.
+
+Pacotes de apoio:
+
+- **`config`** — `SecurityConfig` (regras de acesso e BCrypt) e `DadosDemonstracao` (carga inicial).
+- **`exception`** — excecoes de negocio e o `ApiExceptionHandler`, que centraliza a traducao
+  de erro em resposta HTTP.
+- **`service/notificacao`** — a abstracao do canal de aviso ao aluno.
+
+### Fluxo do informativo semanal
+
+```
+@Scheduled (segunda, 8h)   ou   POST /api/informativo/enviar
+                 |
+                 v
+     InformativoSemanalService
+                 |
+     +-----------+------------+
+     |                        |
+     v                        v
+AlunoRepository          EventoRepository
+(assinatura ativa)    (proximos 7 dias, por instituicao)
+                 |
+                 v
+          Notificador  <interface>
+                 |
+                 v
+          NotificadorEmail  ->  EmailService  ->  SMTP
+```
+
+## Aplicacao dos conteudos de POOA
+
+### SOLID
+
+**S — Responsabilidade unica.** Cada camada tem um motivo para mudar. `AlunoController` so
+cuida de HTTP e nao sabe o que e e-mail duplicado; `AlunoService` decide a regra e nao sabe que
+existe HTTP; `AlunoRepository` so busca e grava. O mesmo vale dentro do informativo:
+`InformativoSemanalService` decide *quem* recebe e *o que* vai na mensagem, enquanto
+`NotificadorEmail` cuida de *como* entregar.
+
+**O — Aberto/fechado.** Dois pontos no codigo:
+
+- `ApiExceptionHandler` concentra o tratamento de erro. Uma excecao nova so precisa de um novo
+  metodo anotado com `@ExceptionHandler`; nenhum controller existente e alterado.
+- `Notificador` e uma interface. Para passar a avisar tambem por SMS, basta uma classe nova
+  implementando `Notificador`, sem encostar em `InformativoSemanalService`.
+
+**L — Substituicao de Liskov.** Os repositorios estendem `JpaRepository` e sao usados pelo tipo
+da interface. `InformativoSemanalService` recebe um `Notificador` e funciona com qualquer
+implementacao que respeite o contrato, sem saber qual chegou.
+
+**I — Segregacao de interfaces.** Em vez de um repositorio unico com todas as consultas do
+sistema, existem tres (`AlunoRepository`, `EventoRepository`, `InstituicaoRepository`), cada um
+com os metodos do seu agregado. Quem precisa de evento nao carrega metodo de aluno junto.
+`Notificador` tambem e minima: um unico metodo.
+
+**D — Inversao de dependencia.** Nenhum service instancia suas dependencias com `new`. Todas
+chegam pelo construtor (via `@RequiredArgsConstructor`), e sempre pelo tipo mais abstrato
+disponivel: os services dependem das *interfaces* de repositorio, e `InformativoSemanalService`
+depende da interface `Notificador`, nao de `EmailService`.
+
+### Padrao GoF
+
+**Adapter** — `NotificadorEmail` adapta a assinatura do `EmailService`, que devolve uma `String`
+com mensagem de erro embutida, ao contrato tipado `Notificador.Resultado`. Isso permitiu colocar
+o `EmailService` atras da abstracao sem alterar uma linha dele.
+
+### Collections e Streams
+
+Usados onde ha transformacao de colecao, nao por enfeite:
+
+- `EventoService.listar()` e `listarProximos()` convertem `List<Evento>` em `List<EventoResponse>`
+  com `stream().map(EventoResponse::de).toList()`.
+- `InstituicaoService.listar()` segue o mesmo caminho.
+- As consultas derivadas do Spring Data (`findByAssinaturaAtivaTrue`,
+  `findByInstituicaoIdAndDataHoraBetweenOrderByDataHoraAsc`) devolvem `List` ja ordenada,
+  evitando ordenacao manual.
+
+### Anotacoes e reflexao
+
+O projeto se apoia em metaprogramacao em tres frentes:
+
+- **JPA** (`@Entity`, `@ManyToOne`, `@Column`) — o Hibernate le as anotacoes por reflexao em
+  tempo de execucao e gera o esquema e as consultas.
+- **Spring** (`@Service`, `@RestController`, `@Scheduled`) — o container varre as classes,
+  instancia e injeta as dependencias por reflexao.
+- **Bean Validation** (`@NotBlank`, `@Email`, `@Size`) — as regras ficam declaradas no proprio
+  `record` do DTO e sao aplicadas antes do metodo do controller executar.
+- **Lombok** (`@Getter`, `@RequiredArgsConstructor`) — processador de anotacoes que gera o
+  codigo repetitivo em tempo de compilacao.
+
+### Recursos de Java moderno
+
+- **`record`** (Java 16+) em todos os DTOs, garantindo imutabilidade do contrato da API.
+- **Metodo de fabrica estatico** `EventoResponse.de(...)`, `AlunoResponse.de(...)`, mantendo a
+  conversao junto do tipo que ela produz.
+- **Concorrencia** — o `@Scheduled` do informativo roda em uma thread do pool do Spring,
+  separada das threads que atendem as requisicoes HTTP, entao o envio semanal nao bloqueia a API.
+
+### Onde o projeto ainda nao esta bem resolvido
+
+Declarado por honestidade, como pede o manual:
+
+- `SmsService` ainda nao implementa `Notificador`; ele existe mas nao esta ligado a nenhum fluxo.
+  Encaixa-lo e justamente o exercicio de OCP descrito acima.
+- `AlunoService` acumula cadastro, consulta e troca de assinatura. Com o sistema crescendo,
+  valeria separar a assinatura em um service proprio.
+- A carga horaria vive dentro do texto de `categoria` ("Oficina - 2h"), o que impede somar as
+  horas de um aluno. O certo seria um campo numerico no `Evento`.
+
 ## Roteiro da demonstracao
 
 O fluxo principal e: **o aluno se inscreve e passa a receber os eventos da semana por e-mail**.
 
-1. Suba a aplicacao pela Opcao 1. Os dados de demonstracao ja entram sozinhos.
+1. Suba a aplicacao com `./mvnw spring-boot:run -Dspring-boot.run.profiles=demo`. Os dados de
+   demonstracao ja entram sozinhos.
 
 2. Confira os eventos que serao divulgados:
 
