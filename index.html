@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos UCSAL Pituaçu - Portal Acadêmico</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style type="text/tailwindcss">
+        @theme {
+            --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+        }
+        @layer components {
+            .campo {
+                @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-400 transition;
+            }
+            .campo:focus {
+                @apply outline-none border-blue-500 ring-4 ring-blue-100;
+            }
+            .rotulo {
+                @apply block text-sm font-semibold text-slate-700 mb-1.5;
+            }
+            .nav-link {
+                @apply text-blue-100 hover:text-white hover:bg-white/10 transition px-3.5 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-2;
+            }
+            .nav-link.ativo {
+                @apply bg-white/15 text-white;
+            }
+        }
+    </style>
+    <style>
+        :focus-visible { outline: 2px solid #34d399; outline-offset: 2px; }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .toast { animation: toast-in .2s ease-out; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- ============ HEADER ============ -->
+    <header class="bg-blue-900 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex justify-between items-center">
+            <button type="button" onclick="mudarVisao('aluno')" class="flex items-center gap-3 text-left" aria-label="Ir para a página inicial">
+                <span class="bg-white text-blue-900 font-extrabold px-2.5 py-1.5 rounded-lg text-lg leading-none">UCSAL</span>
+                <span class="leading-tight">
+                    <span class="block font-bold text-base">Eventos &amp; Extensão</span>
+                    <span class="block text-xs text-blue-200">Campus Pituaçu | POO Avançada</span>
+                </span>
+            </button>
+
+            <!-- Navegação desktop -->
+            <nav class="hidden md:flex items-center gap-1" aria-label="Navegação principal">
+                <button type="button" onclick="mudarVisao('aluno')" data-nav="aluno" class="nav-link"><i class="fa-solid fa-house text-xs"></i> Início</button>
+                <button type="button" onclick="acaoAluno()" data-nav="login-aluno" class="nav-link"><i class="fa-solid fa-user-graduate text-xs"></i> <span class="rotulo-aluno">Login Aluno</span></button>
+                <a href="#inscricao" onclick="irParaInscricao(event)" class="bg-emerald-500 hover:bg-emerald-400 text-white transition px-4 py-2 rounded-lg text-sm font-bold inline-flex items-center gap-2 mx-1"><i class="fa-solid fa-user-plus text-xs"></i> Cadastrar</a>
+                <span class="w-px h-6 bg-white/20 mx-1" aria-hidden="true"></span>
+                <button type="button" onclick="mudarVisao('login-admin')" data-nav="login-admin" data-so-visitante class="nav-link border border-white/20"><i class="fa-solid fa-lock text-xs"></i> Área do Gestor</button>
+                <button type="button" onclick="mudarVisao('admin')" data-nav="admin" data-so-admin class="nav-link hidden"><i class="fa-solid fa-gauge-high text-xs"></i> Painel</button>
+                <button type="button" onclick="sairAdmin()" data-so-admin class="nav-link hidden border border-white/20"><i class="fa-solid fa-right-from-bracket text-xs"></i> Sair</button>
+            </nav>
+
+            <!-- Botão hambúrguer -->
+            <button type="button" id="btn-hamburguer" onclick="alternarMenu()" class="md:hidden w-11 h-11 rounded-lg hover:bg-white/10 flex items-center justify-center transition" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-mobile">
+                <i id="icone-hamburguer" class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Menu mobile -->
+        <div id="menu-mobile" class="hidden md:hidden border-t border-white/10 bg-blue-900">
+            <nav class="px-4 py-4 space-y-1" aria-label="Menu mobile">
+                <button type="button" onclick="mudarVisao('aluno')" data-nav="aluno" class="nav-link w-full !py-3"><i class="fa-solid fa-house w-5 text-center"></i> Início</button>
+                <button type="button" onclick="acaoAluno()" data-nav="login-aluno" class="nav-link w-full !py-3"><i class="fa-solid fa-user-graduate w-5 text-center"></i> <span class="rotulo-aluno">Login Aluno</span></button>
+                <a href="#inscricao" onclick="irParaInscricao(event)" class="bg-emerald-500 hover:bg-emerald-400 text-white transition px-3.5 py-3 rounded-lg text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-user-plus w-5 text-center"></i> Cadastrar</a>
+                <div class="h-px bg-white/10 my-2"></div>
+                <button type="button" onclick="mudarVisao('login-admin')" data-nav="login-admin" data-so-visitante class="nav-link w-full !py-3"><i class="fa-solid fa-lock w-5 text-center"></i> Área do Gestor</button>
+                <button type="button" onclick="mudarVisao('admin')" data-nav="admin" data-so-admin class="nav-link w-full !py-3 hidden"><i class="fa-solid fa-gauge-high w-5 text-center"></i> Painel do Gestor</button>
+                <button type="button" onclick="sairAdmin()" data-so-admin class="nav-link w-full !py-3 hidden"><i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Sair do painel</button>
+            </nav>
+            <div class="px-4 pb-5 pt-1">
+                <div class="rounded-xl bg-blue-950/60 p-4 text-sm">
+                    <div class="flex items-center gap-2 font-bold"><i class="fa-solid fa-building-columns text-blue-300"></i> UCSAL — Campus Pituaçu</div>
+                    <p class="text-blue-200 text-xs mt-1">Eventos &amp; Extensão · POO Avançada</p>
+                    <p class="text-blue-200 text-xs mt-1">Gestão de horas complementares e eventos acadêmicos.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1">
+
+        <!-- ============ VISÃO DO ALUNO ============ -->
+        <div id="view-aluno">
+            <section class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-900 to-indigo-900 text-white">
+                <div class="absolute -right-24 -top-24 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl" aria-hidden="true"></div>
+                <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 lg:py-20 grid lg:grid-cols-2 gap-10 items-center">
+                    <div>
+                        <span id="banner-status-aluno" class="inline-flex items-center gap-2 bg-white/10 text-blue-100 text-xs font-semibold px-3 py-1.5 rounded-full">
+                            <i class="fa-solid fa-graduation-cap"></i> Expositor Acadêmico
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mt-4 mb-4 leading-tight">Gestão de Horas Complementares e Eventos da UCSAL</h2>
+                        <p class="text-base sm:text-lg text-blue-100 mb-8 max-w-xl">Fique por dentro de hackathons, palestras, workshops e muito mais!</p>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="#inscricao" onclick="irParaInscricao(event)" class="bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-emerald-900/30 transition inline-flex items-center justify-center gap-2 text-sm">
+                                <i class="fa-solid fa-bell"></i> Quero me cadastrar
+                            </a>
+                            <a href="#eventos" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3 rounded-xl transition inline-flex items-center justify-center gap-2 text-sm">
+                                <i class="fa-solid fa-calendar-days"></i> Ver eventos
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Próximo evento em destaque -->
+                    <div id="hero-proximo" class="hidden lg:block">
+                        <div class="bg-white text-slate-800 rounded-3xl p-6 shadow-2xl shadow-blue-950/40 max-w-md ml-auto">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm font-semibold text-blue-700 flex items-center gap-2"><i class="fa-solid fa-star"></i> Próximo evento</span>
+                                <span id="hero-horas" class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full"></span>
+                            </div>
+                            <h3 id="hero-titulo" class="text-xl font-bold leading-snug"></h3>
+                            <p id="hero-descricao" class="text-sm text-slate-600 mt-2"></p>
+                            <div class="mt-5 pt-4 border-t border-slate-100 flex items-center gap-2 text-sm text-slate-700 font-medium">
+                                <i class="fa-regular fa-calendar text-blue-600"></i> <span id="hero-data"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista de eventos -->
+            <section id="eventos" class="max-w-7xl mx-auto px-4 sm:px-6 py-12 scroll-mt-20">
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-900">Próximos eventos disponíveis</h3>
+                        <p id="subtitulo-eventos" class="text-sm text-slate-500 mt-1">Faça login como aluno para ver suas inscrições salvas.</p>
+                    </div>
+                    <button type="button" onclick="atualizarEventosAnimado()" class="self-start sm:self-auto text-blue-700 hover:text-blue-900 text-sm font-semibold flex items-center gap-2 bg-blue-50 hover:bg-blue-100 px-4 py-2.5 rounded-xl transition">
+                        <i id="icone-atualizar" class="fa-solid fa-rotate"></i> Atualizar
+                    </button>
+                </div>
+                <div id="grid-eventos-aluno" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Injetado via JS -->
+                </div>
+            </section>
+
+            <!-- Seção de inscrição -->
+            <section id="inscricao" class="bg-white py-12 sm:py-16 px-4 border-y border-slate-200 scroll-mt-16">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-4"><i class="fa-solid fa-bell text-xl"></i></div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-slate-900">Receba alertas de eventos</h3>
+                        <p class="text-slate-600 mt-3">Cadastre seus dados e avisamos quando um novo evento com horas complementares for publicado.</p>
+                        <ul class="mt-5 space-y-2 text-sm text-slate-600">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Notificações por e-mail acadêmico</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Aviso opcional pelo WhatsApp</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-6 sm:p-8 rounded-3xl border border-slate-200">
+                        <form id="form-cadastro" onsubmit="enviarCadastro(event)" class="space-y-4">
+                            <div>
+                                <label for="nome" class="rotulo">Nome completo</label>
+                                <input type="text" id="nome" required autocomplete="name" class="campo" placeholder="Nome Sobrenome">
+                            </div>
+                            <div>
+                                <label for="email" class="rotulo">E-mail acadêmico</label>
+                                <input type="email" id="email" required autocomplete="email" class="campo" placeholder="exemplo@ucsal.edu.br">
+                            </div>
+                            <div>
+                                <label for="whatsapp" class="rotulo">Número WhatsApp <span class="font-normal text-slate-400">(opcional)</span></label>
+                                <input type="tel" id="whatsapp" inputmode="tel" autocomplete="tel" class="campo" placeholder="(71) 99999-9999">
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-sm text-sm">
+                                Concluir inscrição
+                            </button>
+                        </form>
+                        <div id="status-mensagem" class="mt-3 text-center text-sm font-medium" role="status"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ LOGIN DO ALUNO ============ -->
+        <div id="view-login-aluno" class="hidden max-w-md mx-auto px-4 py-12 sm:py-20">
+            <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200">
+                <div class="text-center mb-6">
+                    <div class="inline-flex bg-blue-100 text-blue-800 w-14 h-14 items-center justify-center rounded-2xl mb-3">
+                        <i class="fa-solid fa-user-graduate text-xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900">Portal do Aluno</h3>
+                    <p class="text-sm text-slate-500 mt-1">Informe seu e-mail para carregar suas inscrições.</p>
+                </div>
+                <form onsubmit="fazerLoginAluno(event)" class="space-y-4">
+                    <div>
+                        <label for="login-aluno-email" class="rotulo">E-mail acadêmico</label>
+                        <input type="email" id="login-aluno-email" required autocomplete="email" class="campo" placeholder="aluno@ucsal.edu.br">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow text-sm">
+                        Acessar minhas inscrições
+                    </button>
+                </form>
+                <div class="mt-5 text-center">
+                    <button type="button" onclick="mudarVisao('aluno')" class="text-sm text-blue-600 hover:underline">Voltar para a página inicial</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ LOGIN ADMIN ============ -->
+        <div id="view-login-admin" class="hidden max-w-md mx-auto px-4 py-12 sm:py-20">
+            <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200">
+                <div class="text-center mb-6">
+                    <div class="inline-flex bg-amber-100 text-amber-800 w-14 h-14 items-center justify-center rounded-2xl mb-3">
+                        <i class="fa-solid fa-lock text-xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900">Acesso restrito</h3>
+                    <p class="text-sm text-slate-500 mt-1">Credenciais do painel administrativo.</p>
+                </div>
+                <form onsubmit="fazerLoginAdmin(event)" class="space-y-4" autocomplete="off">
+                    <div>
+                        <label for="login-user" class="rotulo">Usuário / e-mail</label>
+                        <input type="text" id="login-user" required autocomplete="off" class="campo" placeholder="admin@ucsal.br">
+                    </div>
+                    <div>
+                        <label for="login-pass" class="rotulo">Senha</label>
+                        <div class="relative">
+                            <input type="password" id="login-pass" required autocomplete="new-password" class="campo pr-12" placeholder="••••••••">
+                            <button type="button" onclick="alternarSenha()" class="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 text-slate-400 hover:text-slate-600" aria-label="Mostrar ou ocultar senha">
+                                <i id="icone-senha" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="erro-login-admin" class="hidden bg-red-50 text-red-700 border border-red-200 rounded-xl px-4 py-3 text-sm" role="alert"></div>
+                    <button type="submit" id="btn-login-admin" class="w-full bg-slate-900 hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition shadow text-sm">
+                        Entrar no painel
+                    </button>
+                </form>
+                <div class="mt-5 text-center">
+                    <button type="button" onclick="mudarVisao('aluno')" class="text-sm text-blue-600 hover:underline">Voltar para o início</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ PAINEL DO ADMINISTRADOR ============ -->
+        <div id="view-admin" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 bg-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-md">
+                <div>
+                    <span class="inline-flex items-center gap-2 bg-amber-500 text-slate-950 font-bold text-xs px-2.5 py-1 rounded-md"><i class="fa-solid fa-shield-halved"></i> Sessão autenticada</span>
+                    <h2 class="text-xl sm:text-2xl font-bold mt-2">Gestão de Eventos UCSAL</h2>
+                    <p class="text-sm text-slate-400">Adicione, edite ou remova eventos do sistema.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button type="button" onclick="abrirModalCriar()" class="bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-5 py-3 rounded-xl shadow transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-plus"></i> Novo evento
+                    </button>
+                    <button type="button" onclick="sairAdmin()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium px-5 py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Sair
+                    </button>
+                </div>
+            </div>
+
+            <!-- Indicadores -->
+            <div id="admin-stats" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"></div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Eventos registrados no sistema</h3>
+
+                <!-- Tabela (tablet/desktop) -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-sm text-slate-500">
+                                <th class="py-3 px-4 font-semibold">Título do evento</th>
+                                <th class="py-3 px-4 font-semibold">Categoria / horas</th>
+                                <th class="py-3 px-4 font-semibold">Data e hora</th>
+                                <th class="py-3 px-4 font-semibold text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-admin-body" class="divide-y divide-slate-100 text-sm"></tbody>
+                    </table>
+                </div>
+
+                <!-- Cartões (celular) -->
+                <div id="lista-admin-mobile" class="md:hidden space-y-3"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row justify-between gap-2">
+            <span>UCSAL — Campus Pituaçu · Eventos &amp; Extensão</span>
+            <span>Projeto acadêmico · POO Avançada</span>
+        </div>
+    </footer>
+
+    <!-- ============ MODAL CRIAR / EDITAR ============ -->
+    <div id="modal-evento" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4 z-50" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full p-6 shadow-xl max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5">
+                <h3 id="modal-titulo" class="text-lg font-bold text-slate-900">Adicionar novo evento</h3>
+                <button type="button" onclick="fecharModal()" class="w-10 h-10 -mr-2 text-slate-400 hover:text-slate-600" aria-label="Fechar"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="form-evento-admin" onsubmit="salvarEventoAdmin(event)" class="space-y-4">
+                <input type="hidden" id="evento-id">
+                <div>
+                    <label for="adm-titulo" class="rotulo">Nome do evento</label>
+                    <input type="text" id="adm-titulo" required maxlength="120" class="campo" placeholder="Ex: Hackathon de IA">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="adm-categoria" class="rotulo">Categoria</label>
+                        <input type="text" id="adm-categoria" required maxlength="60" class="campo" placeholder="Hackathon • 20h">
+                    </div>
+                    <div>
+                        <label for="adm-data" class="rotulo">Data e hora</label>
+                        <input type="text" id="adm-data" required maxlength="60" class="campo" placeholder="15 Out, 14:00">
+                    </div>
+                </div>
+                <div>
+                    <label for="adm-descricao" class="rotulo">Descrição</label>
+                    <textarea id="adm-descricao" rows="3" required maxlength="400" class="campo" placeholder="Detalhes do evento..."></textarea>
+                </div>
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                    <button type="button" onclick="fecharModal()" class="px-5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition shadow">Salvar evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============ MODAL CONFIRMAR EXCLUSÃO ============ -->
+    <div id="modal-excluir" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50" role="alertdialog" aria-modal="true" aria-labelledby="excluir-titulo">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl text-center">
+            <div class="inline-flex w-14 h-14 rounded-2xl bg-red-100 text-red-600 items-center justify-center mb-3"><i class="fa-solid fa-trash text-xl"></i></div>
+            <h3 id="excluir-titulo" class="text-lg font-bold text-slate-900">Excluir evento?</h3>
+            <p id="excluir-texto" class="text-sm text-slate-600 mt-2"></p>
+            <div class="flex gap-2 mt-6">
+                <button type="button" onclick="fecharModalExcluir()" class="flex-1 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+                <button type="button" onclick="confirmarExclusao()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-3 rounded-xl text-sm transition">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avisos -->
+    <div id="toasts" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-96 z-[60] space-y-2 pointer-events-none" aria-live="polite"></div>
+
+    <!-- ============ SCRIPTS ============ -->
+    <script>
+        /* =====================================================================
+           CONFIGURAÇÃO (simula o carregamento de um arquivo .env)
+           ---------------------------------------------------------------------
+           Em um projeto real com backend (Node/Express, por exemplo), o arquivo
+           .env ficaria SÓ no servidor, fora do Git (.gitignore):
+
+               ADMIN_USER=admin@ucsal.br
+               ADMIN_PASS=Ucsal@2026
+
+           e a validação do login aconteceria em POST /api/admin/login, com
+           a senha guardada como hash (bcrypt/argon2) e sessão via cookie
+           httpOnly ou JWT.
+
+           Aqui, como é apenas front-end, simulamos esse .env guardando apenas
+           o HASH SHA-256 das credenciais (nunca o texto puro). Para trocar,
+           gere novos hashes no console:  await gerarHash('novo-valor')
+           ===================================================================== */
+        const ENV = Object.freeze({
+            ADMIN_USER_SHA256: 'a1837482128b4141b34f6d7103a259c264f8d07536c9e6cb7d7eddb4e4c3d9f0',
+            ADMIN_PASS_SHA256: '1f04ae43207afb80b65a3aa03763f8c668680b90241b8d4acbe0bcf6be2cc347',
+            SESSAO_MINUTOS: 30,
+            MAX_TENTATIVAS: 3,
+            BLOQUEIO_SEGUNDOS: 30
+        });
+
+        const API_URL = 'http://localhost:3000/api';
+
+        async function gerarHash(texto) {
+            if (!window.crypto || !crypto.subtle) throw new Error('crypto.subtle indisponível (use https ou localhost).');
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
+            return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function iguais(a, b) { // comparação sem "saída antecipada"
+            if (a.length !== b.length) return false;
+            let r = 0;
+            for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
+            return r === 0;
+        }
+
+        /* ---------- Módulo de autenticação (estado privado, fora do escopo global) ---------- */
+        const Auth = (() => {
+            let sessao = null;       // { expira }
+            let falhas = 0;
+            let bloqueadoAte = 0;
+
+            return {
+                ativo() {
+                    if (!sessao) return false;
+                    if (Date.now() > sessao.expira) { sessao = null; return false; }
+                    return true;
+                },
+                segundosBloqueado() {
+                    return Math.max(0, Math.ceil((bloqueadoAte - Date.now()) / 1000));
+                },
+                async entrar(usuario, senha) {
+                    if (this.segundosBloqueado() > 0) return { ok: false, bloqueado: true };
+                    const hUser = await gerarHash(usuario.trim().toLowerCase());
+                    const hPass = await gerarHash(senha);
+                    const okUser = iguais(hUser, ENV.ADMIN_USER_SHA256);
+                    const okPass = iguais(hPass, ENV.ADMIN_PASS_SHA256);
+                    if (okUser && okPass) {
+                        falhas = 0;
+                        sessao = { expira: Date.now() + ENV.SESSAO_MINUTOS * 60000 };
+                        return { ok: true };
+                    }
+                    falhas++;
+                    if (falhas >= ENV.MAX_TENTATIVAS) {
+                        falhas = 0;
+                        bloqueadoAte = Date.now() + ENV.BLOQUEIO_SEGUNDOS * 1000;
+                        return { ok: false, bloqueado: true };
+                    }
+                    return { ok: false, restantes: ENV.MAX_TENTATIVAS - falhas };
+                },
+                sair() { sessao = null; }
+            };
+        })();
+
+        /* ---------- Dados em memória ---------- */
+        let alunoLogado = null;      // e-mail do aluno logado
+        let inscricoesMemoria = [];  // pares { email, eventoId }
+        let alunosMemoria = [];      // cadastros de alertas
+        let idParaExcluir = null;
+
+        let eventosMemoria = [
+            { id: 1, titulo: "I Hackathon de IA Aplicada - Pituaçu", categoria: "Hackathon • 20h Comp.", data: "15 de Outubro, 2026", descricao: "Maratona de programação voltada para criar soluções utilizando inteligência artificial." },
+            { id: 2, titulo: "Arquitetura de Microsserviços e POO", categoria: "Palestra • 4h Comp.", data: "22 de Outubro, 2026", descricao: "Palestra aprofundada sobre como aplicar orientação a objetos em grande escala." }
+        ];
+
+        /* ---------- Utilitários ---------- */
+        const $ = (id) => document.getElementById(id);
+
+        function esc(valor) { // evita injeção de HTML nos textos digitados
+            return String(valor).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function partirCategoria(cat) {
+            const partes = String(cat).split('•');
+            return { tipo: partes[0].trim(), horas: (partes[1] || '').trim() };
+        }
+
+        function iconeDaCategoria(tipo) {
+            const t = tipo.toLowerCase();
+            if (t.includes('hackathon')) return 'fa-code';
+            if (t.includes('palestra')) return 'fa-microphone-lines';
+            if (t.includes('workshop') || t.includes('oficina')) return 'fa-screwdriver-wrench';
+            if (t.includes('minicurso') || t.includes('curso')) return 'fa-book-open';
+            return 'fa-calendar-check';
+        }
+
+        function horasNumericas(cat) {
+            const m = partirCategoria(cat).horas.match(/(\d+)\s*h/i);
+            return m ? parseInt(m[1], 10) : 0;
+        }
+
+        function toast(mensagem, tipo = 'ok') {
+            const cores = {
+                ok: 'bg-emerald-600', erro: 'bg-red-600', info: 'bg-slate-800'
+            };
+            const icones = { ok: 'fa-circle-check', erro: 'fa-circle-exclamation', info: 'fa-circle-info' };
+            const el = document.createElement('div');
+            el.className = `toast pointer-events-auto ${cores[tipo]} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-lg flex items-center gap-3`;
+            el.innerHTML = `<i class="fa-solid ${icones[tipo]}"></i><span></span>`;
+            el.querySelector('span').textContent = mensagem;
+            $('toasts').appendChild(el);
+            setTimeout(() => el.remove(), 3500);
+        }
+
+        /* ---------- Menu hambúrguer ---------- */
+        function alternarMenu(forcarFechar = false) {
+            const menu = $('menu-mobile');
+            const abrir = forcarFechar ? false : menu.classList.contains('hidden');
+            menu.classList.toggle('hidden', !abrir);
+            $('btn-hamburguer').setAttribute('aria-expanded', String(abrir));
+            $('btn-hamburguer').setAttribute('aria-label', abrir ? 'Fechar menu' : 'Abrir menu');
+            $('icone-hamburguer').className = abrir ? 'fa-solid fa-xmark text-xl' : 'fa-solid fa-bars text-xl';
+        }
+
+        window.addEventListener('resize', () => { if (window.innerWidth >= 768) alternarMenu(true); });
+
+        /* ---------- Navegação entre telas ---------- */
+        const VISOES = ['aluno', 'login-aluno', 'login-admin', 'admin'];
+
+        function mudarVisao(visao) {
+            // Rota protegida: o painel só abre com sessão de administrador válida
+            if (visao === 'admin' && !Auth.ativo()) {
+                toast('Faça login como gestor para acessar o painel.', 'erro');
+                visao = 'login-admin';
+            }
+            // Já autenticado? Não precisa ver a tela de login novamente
+            if (visao === 'login-admin' && Auth.ativo()) visao = 'admin';
+
+            VISOES.forEach(v => $('view-' + v).classList.toggle('hidden', v !== visao));
+            if (visao === 'admin') renderizarAdmin();
+            else limparAdmin();
+
+            document.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('ativo', b.dataset.nav === visao));
+            alternarMenu(true);
+            atualizarNavAdmin();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function atualizarNavAdmin() {
+            const logado = Auth.ativo();
+            document.querySelectorAll('[data-so-admin]').forEach(el => el.classList.toggle('hidden', !logado));
+            document.querySelectorAll('[data-so-visitante]').forEach(el => el.classList.toggle('hidden', logado));
+        }
+
+        function irParaInscricao(e) {
+            e.preventDefault();
+            mudarVisao('aluno');
+            setTimeout(() => $('inscricao').scrollIntoView({ behavior: 'smooth' }), 60);
+        }
+
+        /* ---------- Visão do aluno ---------- */
+        function cardEvento(ev) {
+            const { tipo, horas } = partirCategoria(ev.categoria);
+            const inscrito = alunoLogado && inscricoesMemoria.some(i => i.email === alunoLogado && i.eventoId === ev.id);
+            return `
+            <article class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition p-6 flex flex-col">
+                <div class="flex items-start justify-between gap-3 mb-4">
+                    <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0"><i class="fa-solid ${iconeDaCategoria(tipo)}"></i></div>
+                    <div class="flex flex-wrap justify-end gap-2">
+                        <span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full">${esc(tipo)}</span>
+                        ${horas ? `<span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">${esc(horas)}</span>` : ''}
+                    </div>
+                </div>
+                <h4 class="font-bold text-lg text-slate-900 leading-snug">${esc(ev.titulo)}</h4>
+                <p class="text-sm text-slate-600 mt-2 flex-1">${esc(ev.descricao)}</p>
+                <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <span class="text-sm text-slate-600 font-medium flex items-center gap-2"><i class="fa-regular fa-calendar text-blue-600"></i> ${esc(ev.data)}</span>
+                    <button type="button" onclick="alternarInscricao(${ev.id})" class="text-sm font-bold px-4 py-2 rounded-lg transition ${inscrito ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-blue-600 text-white hover:bg-blue-700'}">
+                        ${inscrito ? '<i class="fa-solid fa-check"></i> Inscrito' : 'Inscreva-se'}
+                    </button>
+                </div>
+            </article>`;
+        }
+
+        function renderizarEventosAluno() {
+            const grid = $('grid-eventos-aluno');
+            grid.innerHTML = eventosMemoria.length
+                ? eventosMemoria.map(cardEvento).join('')
+                : `<div class="col-span-full text-center bg-white border border-dashed border-slate-300 rounded-2xl py-14 px-4">
+                       <i class="fa-regular fa-calendar-xmark text-3xl text-slate-400"></i>
+                       <p class="font-semibold text-slate-700 mt-3">Nenhum evento publicado ainda</p>
+                       <p class="text-sm text-slate-500">Cadastre seu e-mail abaixo para ser avisado quando houver novidades.</p>
+                   </div>`;
+
+            const sub = $('subtitulo-eventos');
+            if (alunoLogado) {
+                const n = inscricoesMemoria.filter(i => i.email === alunoLogado).length;
+                sub.textContent = `Conectado como ${alunoLogado} · ${n} inscrição(ões) salva(s).`;
+            } else {
+                sub.textContent = 'Faça login como aluno para ver suas inscrições salvas.';
+            }
+            renderizarDestaque();
+        }
+
+        function renderizarDestaque() {
+            const box = $('hero-proximo');
+            const ev = eventosMemoria[0];
+            // Sem eventos: esconde sempre. Com eventos: só aparece no desktop (lg:block).
+            box.classList.toggle('lg:block', !!ev);
+            if (!ev) return;
+            const { tipo, horas } = partirCategoria(ev.categoria);
+            $('hero-titulo').textContent = ev.titulo;
+            $('hero-descricao').textContent = ev.descricao;
+            $('hero-data').textContent = ev.data;
+            $('hero-horas').textContent = horas || tipo;
+        }
+
+        function alternarInscricao(eventoId) {
+            if (!alunoLogado) {
+                toast('Faça login como aluno para se inscrever.', 'info');
+                mudarVisao('login-aluno');
+                return;
+            }
+            const idx = inscricoesMemoria.findIndex(i => i.email === alunoLogado && i.eventoId === eventoId);
+            if (idx >= 0) { inscricoesMemoria.splice(idx, 1); toast('Inscrição cancelada.', 'info'); }
+            else { inscricoesMemoria.push({ email: alunoLogado, eventoId }); toast('Inscrição confirmada!'); }
+            renderizarEventosAluno();
+        }
+
+        function atualizarEventosAnimado() {
+            const icone = $('icone-atualizar');
+            icone.classList.add('animate-spin');
+            setTimeout(() => {
+                renderizarEventosAluno();
+                icone.classList.remove('animate-spin');
+                toast('Lista de eventos atualizada.', 'info');
+            }, 700);
+        }
+
+        function enviarCadastro(e) {
+            e.preventDefault();
+            const nome = $('nome').value.trim();
+            const email = $('email').value.trim().toLowerCase();
+            const whatsapp = $('whatsapp').value.trim();
+            const status = $('status-mensagem');
+
+            if (alunosMemoria.some(a => a.email === email)) {
+                status.className = 'mt-3 text-center text-sm font-medium text-amber-600';
+                status.textContent = 'Este e-mail já está cadastrado para receber alertas.';
+                return;
+            }
+            alunosMemoria.push({ nome, email, whatsapp });
+            status.className = 'mt-3 text-center text-sm font-medium text-emerald-600';
+            status.textContent = 'Inscrição concluída! Você receberá os próximos alertas.';
+            toast('Cadastro realizado com sucesso!');
+            $('form-cadastro').reset();
+            setTimeout(() => { status.textContent = ''; }, 5000);
+        }
+
+        function fazerLoginAluno(e) {
+            e.preventDefault();
+            alunoLogado = $('login-aluno-email').value.trim().toLowerCase();
+            $('login-aluno-email').value = '';
+            atualizarEstadoAluno();
+            renderizarEventosAluno();
+            mudarVisao('aluno');
+            toast('Bem-vindo! Suas inscrições foram carregadas.');
+        }
+
+        function acaoAluno() {
+            if (alunoLogado) sairAluno();
+            else mudarVisao('login-aluno');
+        }
+
+        function sairAluno() {
+            alunoLogado = null;
+            atualizarEstadoAluno();
+            renderizarEventosAluno();
+            mudarVisao('aluno');
+            toast('Você saiu da conta de aluno.', 'info');
+        }
+
+        function atualizarEstadoAluno() {
+            document.querySelectorAll('.rotulo-aluno').forEach(el => {
+                el.textContent = alunoLogado ? 'Sair (aluno)' : 'Login Aluno';
+            });
+            const banner = $('banner-status-aluno');
+            banner.innerHTML = alunoLogado
+                ? '<i class="fa-solid fa-circle-check"></i> Aluno conectado'
+                : '<i class="fa-solid fa-graduation-cap"></i> Expositor Acadêmico';
+        }
+
+        /* ---------- Login / logout do administrador ---------- */
+        function alternarSenha() {
+            const campo = $('login-pass');
+            const mostrar = campo.type === 'password';
+            campo.type = mostrar ? 'text' : 'password';
+            $('icone-senha').className = mostrar ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+        }
+
+        function mostrarErroAdmin(msg) {
+            const box = $('erro-login-admin');
+            box.textContent = msg;
+            box.classList.toggle('hidden', !msg);
+        }
+
+        async function fazerLoginAdmin(e) {
+            e.preventDefault();
+            const btn = $('btn-login-admin');
+            mostrarErroAdmin('');
+            btn.disabled = true;
+            btn.textContent = 'Verificando...';
+            try {
+                const r = await Auth.entrar($('login-user').value, $('login-pass').value);
+                $('login-pass').value = '';
+                if (r.ok) {
+                    $('login-user').value = '';
+                    toast('Login realizado. Bem-vindo, gestor!');
+                    mudarVisao('admin');
+                } else if (r.bloqueado) {
+                    mostrarErroAdmin(`Muitas tentativas. Aguarde ${Auth.segundosBloqueado()} segundos para tentar novamente.`);
+                } else {
+                    mostrarErroAdmin(`Usuário ou senha inválidos. Restam ${r.restantes} tentativa(s).`);
+                }
+            } catch (err) {
+                mostrarErroAdmin('Não foi possível validar o login neste ambiente. Abra a página via localhost ou https.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Entrar no painel';
+            }
+        }
+
+        function sairAdmin() {
+            Auth.sair();
+            limparAdmin();
+            fecharModal();
+            fecharModalExcluir();
+            mudarVisao('aluno');
+            toast('Sessão do gestor encerrada.', 'info');
+        }
+
+        /* ---------- Painel do administrador (todas as ações exigem autenticação) ---------- */
+        function exigirAdmin() {
+            if (Auth.ativo()) return true;
+            toast('Sessão expirada ou não autorizada. Faça login novamente.', 'erro');
+            fecharModal();
+            fecharModalExcluir();
+            mudarVisao('login-admin');
+            return false;
+        }
+
+        function limparAdmin() { // remove os dados do painel do DOM quando não há sessão
+            $('tabela-admin-body').innerHTML = '';
+            $('lista-admin-mobile').innerHTML = '';
+            $('admin-stats').innerHTML = '';
+        }
+
+        function renderizarAdmin() {
+            if (!Auth.ativo()) return;
+
+            const totalHoras = eventosMemoria.reduce((s, e) => s + horasNumericas(e.categoria), 0);
+            const stat = (icone, cor, valor, rotulo) => `
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl ${cor} flex items-center justify-center"><i class="fa-solid ${icone} text-lg"></i></div>
+                    <div><p class="text-2xl font-extrabold text-slate-900 leading-none">${valor}</p><p class="text-sm text-slate-500 mt-1">${rotulo}</p></div>
+                </div>`;
+            $('admin-stats').innerHTML =
+                stat('fa-calendar-check', 'bg-blue-50 text-blue-700', eventosMemoria.length, 'Eventos publicados') +
+                stat('fa-clock', 'bg-emerald-50 text-emerald-700', totalHoras + 'h', 'Horas complementares ofertadas') +
+                stat('fa-users', 'bg-amber-50 text-amber-700', inscricoesMemoria.length, 'Inscrições em eventos');
+
+            if (!eventosMemoria.length) {
+                const vazio = `<div class="text-center py-10 text-slate-500 text-sm">Nenhum evento cadastrado. Use <strong>Novo evento</strong> para começar.</div>`;
+                $('tabela-admin-body').innerHTML = `<tr><td colspan="4">${vazio}</td></tr>`;
+                $('lista-admin-mobile').innerHTML = vazio;
+                return;
+            }
+
+            $('tabela-admin-body').innerHTML = eventosMemoria.map(ev => {
+                const { tipo, horas } = partirCategoria(ev.categoria);
+                return `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="py-4 px-4 font-semibold text-slate-900 max-w-xs">${esc(ev.titulo)}</td>
+                    <td class="py-4 px-4">
+                        <span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full">${esc(tipo)}</span>
+                        ${horas ? `<span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full ml-1">${esc(horas)}</span>` : ''}
+                    </td>
+                    <td class="py-4 px-4 text-slate-600 whitespace-nowrap">${esc(ev.data)}</td>
+                    <td class="py-4 px-4 text-right whitespace-nowrap">
+                        <button type="button" onclick="abrirModalEditar(${ev.id})" class="w-9 h-9 rounded-lg text-blue-600 hover:bg-blue-50 transition" aria-label="Editar ${esc(ev.titulo)}"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" onclick="pedirExclusao(${ev.id})" class="w-9 h-9 rounded-lg text-red-600 hover:bg-red-50 transition" aria-label="Excluir ${esc(ev.titulo)}"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            $('lista-admin-mobile').innerHTML = eventosMemoria.map(ev => {
+                const { tipo, horas } = partirCategoria(ev.categoria);
+                return `
+                <div class="border border-slate-200 rounded-xl p-4">
+                    <p class="font-semibold text-slate-900">${esc(ev.titulo)}</p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full">${esc(tipo)}</span>
+                        ${horas ? `<span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">${esc(horas)}</span>` : ''}
+                    </div>
+                    <p class="text-sm text-slate-600 mt-2 flex items-center gap-2"><i class="fa-regular fa-calendar text-blue-600"></i> ${esc(ev.data)}</p>
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button type="button" onclick="abrirModalEditar(${ev.id})" class="py-2.5 rounded-lg bg-blue-50 text-blue-700 text-sm font-semibold"><i class="fa-solid fa-pen"></i> Editar</button>
+                        <button type="button" onclick="pedirExclusao(${ev.id})" class="py-2.5 rounded-lg bg-red-50 text-red-700 text-sm font-semibold"><i class="fa-solid fa-trash"></i> Excluir</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        /* ---------- Modais e CRUD ---------- */
+        function abrirModal() {
+            const m = $('modal-evento');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            setTimeout(() => $('adm-titulo').focus(), 50);
+        }
+
+        function fecharModal() {
+            const m = $('modal-evento');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function abrirModalCriar() {
+            if (!exigirAdmin()) return;
+            $('form-evento-admin').reset();
+            $('evento-id').value = '';
+            $('modal-titulo').textContent = 'Adicionar novo evento';
+            abrirModal();
+        }
+
+        function abrirModalEditar(id) {
+            if (!exigirAdmin()) return;
+            const ev = eventosMemoria.find(x => x.id === id);
+            if (!ev) return;
+            $('evento-id').value = ev.id;
+            $('adm-titulo').value = ev.titulo;
+            $('adm-categoria').value = ev.categoria;
+            $('adm-data').value = ev.data;
+            $('adm-descricao').value = ev.descricao;
+            $('modal-titulo').textContent = 'Editar evento';
+            abrirModal();
+        }
+
+        function salvarEventoAdmin(e) {
+            e.preventDefault();
+            if (!exigirAdmin()) return;
+
+            const dados = {
+                titulo: $('adm-titulo').value.trim(),
+                categoria: $('adm-categoria').value.trim(),
+                data: $('adm-data').value.trim(),
+                descricao: $('adm-descricao').value.trim()
+            };
+            const idAtual = parseInt($('evento-id').value, 10);
+
+            if (idAtual) {
+                const ev = eventosMemoria.find(x => x.id === idAtual);
+                if (ev) Object.assign(ev, dados);
+                toast('Evento atualizado.');
+            } else {
+                const novoId = eventosMemoria.reduce((m, x) => Math.max(m, x.id), 0) + 1;
+                eventosMemoria.push({ id: novoId, ...dados });
+                toast('Evento criado.');
+            }
+            fecharModal();
+            renderizarAdmin();
+            renderizarEventosAluno();
+        }
+
+        function pedirExclusao(id) {
+            if (!exigirAdmin()) return;
+            const ev = eventosMemoria.find(x => x.id === id);
+            if (!ev) return;
+            idParaExcluir = id;
+            $('excluir-texto').textContent = `"${ev.titulo}" será removido do sistema e das inscrições dos alunos.`;
+            const m = $('modal-excluir');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function fecharModalExcluir() {
+            const m = $('modal-excluir');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+            idParaExcluir = null;
+        }
+
+        function confirmarExclusao() {
+            if (!exigirAdmin()) return;
+            eventosMemoria = eventosMemoria.filter(x => x.id !== idParaExcluir);
+            inscricoesMemoria = inscricoesMemoria.filter(i => i.eventoId !== idParaExcluir);
+            fecharModalExcluir();
+            renderizarAdmin();
+            renderizarEventosAluno();
+            toast('Evento excluído.', 'info');
+        }
+
+        /* ---------- Teclado e cliques fora ---------- */
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            fecharModal();
+            fecharModalExcluir();
+            alternarMenu(true);
+        });
+        ['modal-evento', 'modal-excluir'].forEach(id => {
+            $(id).addEventListener('click', (e) => {
+                if (e.target.id === id) { id === 'modal-evento' ? fecharModal() : fecharModalExcluir(); }
+            });
+        });
+
+        /* ---------- Máscara simples de telefone ---------- */
+        $('whatsapp').addEventListener('input', (e) => {
+            let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 6) v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+            else if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`;
+            e.target.value = v;
+        });
+
+        /* ---------- Inicialização ---------- */
+        renderizarEventosAluno();
+        atualizarEstadoAluno();
+        mudarVisao('aluno');
+        window.scrollTo(0, 0);
+    </script>
+</body>
+</html>
