@@ -31,19 +31,19 @@ public class DadosDemonstracao implements CommandLineRunner {
 
         salvarEvento(ucsal, "Semana de Tecnologia",
                 "Palestras e oficinas sobre desenvolvimento de software e carreira em TI.",
-                "Auditorio do Campus Pituacu", agora.plusDays(2), "Palestra - 4h");
+                "Auditorio do Campus Pituacu", agora.plusDays(2), "Palestra", 4);
 
         salvarEvento(ucsal, "Oficina de Banco de Dados",
                 "Oficina pratica de modelagem e consultas SQL.",
-                "Laboratorio 3 - Campus Pituacu", agora.plusDays(4), "Oficina - 2h");
+                "Laboratorio 3 - Campus Pituacu", agora.plusDays(4), "Oficina", 2);
 
         salvarEvento(ucsal, "Mostra de Projetos de Extensao",
                 "Apresentacao dos projetos de extensao do semestre.",
-                "Hall do Campus Pituacu", agora.plusDays(6), "Mostra - 3h");
+                "Hall do Campus Pituacu", agora.plusDays(6), "Mostra", 3);
 
         salvarEvento(ucsal, "Congresso de Iniciacao Cientifica",
                 "Apresentacao de trabalhos de iniciacao cientifica.",
-                "Auditorio Central", agora.plusDays(20), "Congresso - 8h");
+                "Auditorio Central", agora.plusDays(20), "Congresso", 8);
     }
 
     private Instituicao salvarInstituicao(String nome, String sigla) {
@@ -54,13 +54,15 @@ public class DadosDemonstracao implements CommandLineRunner {
     }
 
     private void salvarEvento(Instituicao instituicao, String nome, String descricao,
-                              String local, LocalDateTime dataHora, String categoria) {
+                              String local, LocalDateTime dataHora, String categoria,
+                              int cargaHoraria) {
         Evento evento = new Evento();
         evento.setNome(nome);
         evento.setDescricao(descricao);
         evento.setLocal(local);
         evento.setDataHora(dataHora);
         evento.setCategoria(categoria);
+        evento.setCargaHoraria(cargaHoraria);
         evento.setInstituicao(instituicao);
         eventoRepository.save(evento);
     }

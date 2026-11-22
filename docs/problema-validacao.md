@@ -1,9 +1,19 @@
 # Anexos A e B — Ficha do problema e registro de validacao
 
-> ATENCAO: este arquivo tem a estrutura pronta, mas o conteudo da validacao precisa ser
-> preenchido pela equipe com o que foi realmente observado. O manual diz expressamente que
-> evidencia inventada compromete a avaliacao. Preencham apenas com conversas e observacoes
-> que aconteceram de verdade.
+> **ESTE ARQUIVO AINDA NAO ESTA PRONTO PARA ENTREGA.**
+>
+> A estrutura esta montada, mas as evidencias de validacao precisam ser preenchidas pela
+> equipe com o que foi realmente conversado e observado. Isto nao pode ser gerado nem
+> estimado por ninguem que nao tenha participado das conversas.
+>
+> O manual da disciplina lista "evidencias de validacao inventadas, sem origem ou apresentadas
+> de forma enganosa" entre as situacoes que comprometem a avaliacao. Preencher com algo
+> plausivel mas falso e pior do que entregar incompleto.
+>
+> Se ainda nao houve conversa, da para resolver hoje: falem com 3 ou 4 colegas de turma,
+> perguntem como eles descobrem os eventos que valem horas complementares e se ja perderam
+> algum por nao ficar sabendo a tempo. Anotem a resposta real, inclusive quando ela contrariar
+> a ideia do projeto, porque o manual valoriza registrar a contradicao.
 
 ---
 

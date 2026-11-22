@@ -2,6 +2,7 @@ package com.example.poo_advanced_project.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -43,11 +44,26 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/api/alunos/**").permitAll()
-                        .requestMatchers("/api/instituicoes/**").permitAll()
-                        .requestMatchers("/api/eventos/**").permitAll()
-                        .requestMatchers("/api/informativo/**").permitAll()
+                        // paginas e recursos do portal
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**",
+                                "/favicon.ico", "/error").permitAll()
+
+                        // o aluno se cadastra e cancela a propria assinatura sem login
+                        .requestMatchers(HttpMethod.POST, "/api/alunos").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/assinaturas/cancelar").permitAll()
+
+                        // o portal lista eventos e instituicoes publicamente
+                        .requestMatchers(HttpMethod.GET, "/api/eventos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/instituicoes/**").permitAll()
+
+                        // cadastrar evento e instituicao e ato administrativo
+                        .requestMatchers(HttpMethod.POST, "/api/eventos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/instituicoes/**").hasRole("ADMIN")
+
+                        // dados pessoais de aluno e disparo em massa de e-mail
+                        .requestMatchers("/api/alunos/**").hasRole("ADMIN")
+                        .requestMatchers("/api/informativo/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())

@@ -11,6 +11,7 @@ public record EventoResponse(
         String local,
         LocalDateTime dataHora,
         String categoria,
+        Integer cargaHoraria,
         Long instituicaoId
 ) {
 
@@ -22,6 +23,7 @@ public record EventoResponse(
                 evento.getLocal(),
                 evento.getDataHora(),
                 evento.getCategoria(),
+                evento.getCargaHoraria(),
                 evento.getInstituicao().getId()
         );
     }

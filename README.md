@@ -23,13 +23,16 @@ filtrada pela instituicao dele e com a carga horaria de cada evento.
 
 ## Integrantes e turma
 
+> ATENCAO equipe: confiram o nome completo e preencham a turma de cada um antes de enviar.
+> Os nomes abaixo foram preenchidos a partir do grupo e podem estar incompletos.
+
 | Nome completo | Turma |
 |---|---|
-| (preencher) | (preencher) |
-| (preencher) | (preencher) |
-| (preencher) | (preencher) |
-| (preencher) | (preencher) |
-| (preencher) | (preencher) |
+| Daniel Tambon | (preencher) |
+| Andre Luis | (preencher) |
+| Ricardo | (preencher) |
+| Kiara | (preencher) |
+| Gabriel Ferreira | (preencher) |
 
 ## Tecnologias
 
@@ -89,7 +92,38 @@ cd poo-advanced-project
 
 As tabelas sao criadas automaticamente pelo Hibernate no primeiro start.
 
-## Credenciais de teste
+## Credenciais e variaveis de ambiente
+
+Nenhuma credencial fica versionada. O repositorio nao contem senha de e-mail, chave de API nem
+dados do banco.
+
+### Para o envio de e-mail funcionar
+
+O cadastro, a listagem e o portal funcionam sem configurar nada. Para o informativo sair de
+verdade, defina duas variaveis de ambiente antes de subir a aplicacao:
+
+Windows (PowerShell):
+
+```
+$env:MAIL_USERNAME = "conta@gmail.com"
+$env:MAIL_PASSWORD = "senha de aplicativo do Gmail"
+```
+
+Linux ou macOS:
+
+```
+export MAIL_USERNAME="conta@gmail.com"
+export MAIL_PASSWORD="senha de aplicativo do Gmail"
+```
+
+Use uma senha de aplicativo do Gmail, nao a senha da conta. Sem essas variaveis a aplicacao
+sobe normalmente e o disparo do informativo responde com a falha de envio no campo `falhas`,
+em vez de quebrar.
+
+Alternativa: coloque os mesmos valores em `application-local.properties`, que esta no
+`.gitignore`. Use `application-local.properties.example` como modelo.
+
+### Usuarios administrativos
 
 Usuarios em memoria, apenas para demonstracao:
 
@@ -100,18 +134,29 @@ Usuarios em memoria, apenas para demonstracao:
 
 ## Endpoints
 
+Rotas publicas, usadas pelo portal:
+
 | Metodo | Rota | O que faz |
 |---|---|---|
 | POST | `/api/alunos` | Cadastra um aluno e ativa a assinatura |
-| GET | `/api/alunos/{id}` | Consulta um aluno |
-| PATCH | `/api/alunos/{id}/assinatura?ativa=true\|false` | Liga ou desliga a assinatura |
-| POST | `/api/instituicoes` | Cadastra uma instituicao |
-| GET | `/api/instituicoes` | Lista as instituicoes |
-| POST | `/api/eventos` | Cadastra um evento |
+| POST | `/api/assinaturas/cancelar` | O proprio aluno cancela, informando e-mail e senha |
 | GET | `/api/eventos` | Lista os eventos |
 | GET | `/api/eventos?proximos=true` | Lista apenas os eventos futuros |
 | GET | `/api/eventos/{id}` | Consulta um evento |
+| GET | `/api/instituicoes` | Lista as instituicoes |
+
+Rotas administrativas, exigem login com papel `ADMIN`:
+
+| Metodo | Rota | O que faz |
+|---|---|---|
+| POST | `/api/eventos` | Cadastra um evento |
+| POST | `/api/instituicoes` | Cadastra uma instituicao |
+| GET | `/api/alunos/{id}` | Consulta os dados de um aluno |
+| PATCH | `/api/alunos/{id}/assinatura?ativa=true\|false` | Liga ou desliga a assinatura de um aluno |
 | POST | `/api/informativo/enviar` | Dispara o informativo semanal na hora |
+
+Dados pessoais de aluno e o disparo em massa de e-mail ficam atras de autenticacao de proposito:
+sao as duas rotas com potencial de vazamento e de abuso.
 
 ## Arquitetura
 
@@ -239,16 +284,34 @@ O projeto se apoia em metaprogramacao em tres frentes:
 - **Concorrencia** — o `@Scheduled` do informativo roda em uma thread do pool do Spring,
   separada das threads que atendem as requisicoes HTTP, entao o envio semanal nao bloqueia a API.
 
+### Correcoes de projeto feitas apos a revisao por pares
+
+Um integrante revisou o codigo e apontou problemas reais. O que mudou:
+
+- **Vazamento de abstracao no agendamento.** O envio automatico quebrava com
+  `LazyInitializationException`: o metodo anotado com `@Scheduled` chamava o metodo transacional
+  pela propria instancia (`this`), o proxy do Spring nao entrava em acao e nao havia sessao
+  aberta para carregar a instituicao do aluno. A correcao foi na consulta, nao na anotacao: os
+  repositorios passaram a usar `join fetch` e devolvem o agregado completo, o que elimina a
+  dependencia de uma transacao aberta durante o envio.
+- **Injecao por campo.** `EmailService` usava `@Autowired` em atributo; passou a receber o
+  `JavaMailSender` pelo construtor, como as demais classes.
+- **Dependencia criada com `new` dentro do metodo.** `SmsService` construia o `VonageClient` a
+  cada envio. O cliente virou um bean (`VonageConfig`) injetado por construtor.
+- **Responsabilidade acumulada.** `AlunoService` cuidava tambem da assinatura; a assinatura saiu
+  para `AssinaturaService`. A redacao da mensagem saiu de `InformativoSemanalService` para
+  `RedatorInformativo`.
+- **Modelagem.** A carga horaria vivia dentro do texto da categoria ("Palestra - 4h"), o que
+  impedia somar horas. Virou o campo numerico `cargaHoraria` em `Evento`.
+
 ### Onde o projeto ainda nao esta bem resolvido
 
 Declarado por honestidade, como pede o manual:
 
-- `SmsService` ainda nao implementa `Notificador`; ele existe mas nao esta ligado a nenhum fluxo.
-  Encaixa-lo e justamente o exercicio de OCP descrito acima.
-- `AlunoService` acumula cadastro, consulta e troca de assinatura. Com o sistema crescendo,
-  valeria separar a assinatura em um service proprio.
-- A carga horaria vive dentro do texto de `categoria` ("Oficina - 2h"), o que impede somar as
-  horas de um aluno. O certo seria um campo numerico no `Evento`.
+- O `@Scheduled` nao e idempotente: dois disparos no mesmo dia reenviam o mesmo conteudo.
+- `NotificadorSms` existe e respeita o contrato, mas o cadastro ainda nao coleta telefone, entao
+  o canal nao tem como ser usado de verdade.
+- Nao ha teste de camada web (`@WebMvcTest`); os testes cobrem servico e regra de negocio.
 
 ## Roteiro da demonstracao
 
@@ -310,25 +373,28 @@ cd poo-advanced-project
 
 ## Limitacoes conhecidas
 
-- A interface web (`index.html`) ainda nao consome a API. As telas existem e navegam, mas os
-  dados sao de exemplo no navegador. O fluxo principal e demonstrado pela API.
-- Nao existe login do aluno. O `PasswordEncoder` ja grava a senha em BCrypt no cadastro, mas a
-  autenticacao de aluno nao foi implementada; so existem os usuarios administrativos em memoria.
-- Por causa disso, `GET /api/alunos/{id}` esta aberto e devolve dados de aluno sem autenticacao.
-- O envio de SMS (`SmsService`) esta implementado mas nao e acionado por nenhum fluxo.
-- O campo de carga horaria do evento e texto livre dentro de `categoria` (ex: "Oficina - 2h"),
-  nao um numero separado. Isso impede somar as horas de um aluno.
-- A matricula nao e unica no banco.
-- O agendamento semanal nao guarda historico do que ja foi enviado, entao dois disparos no mesmo
-  dia enviam o mesmo conteudo duas vezes.
-- A cobertura de testes automatizados e minima.
+- Nao existe login do aluno. A senha e gravada em BCrypt no cadastro e e usada para o aluno
+  cancelar a propria assinatura, mas nao ha sessao nem area logada. As rotas que expoem dados
+  pessoais ficam restritas ao papel `ADMIN`.
+- Os usuarios administrativos sao fixos em memoria (`admin` e `user`), definidos em
+  `SecurityConfig`. Nao ha cadastro de administrador.
+- O informativo nao guarda historico de envio, entao dois disparos no mesmo dia mandam o mesmo
+  conteudo duas vezes.
+- O canal de SMS esta implementado (`NotificadorSms`) mas nao e o canal ativo. Para usa-lo seria
+  preciso trocar qual implementacao de `Notificador` e a primaria, e o cadastro do aluno ainda
+  nao coleta telefone.
+- O portal do aluno (login por e-mail, lista de inscricoes) ainda guarda estado apenas no
+  navegador. O cadastro e a listagem de eventos ja vem da API.
+- A carga horaria e um numero inteiro de horas; nao ha suporte a fracao.
+- Nao ha paginacao nas listagens.
 
 ## Proximos passos
 
-1. Conectar a interface web a API.
-2. Implementar o login do aluno e fechar as rotas de consulta.
-3. Separar a carga horaria em campo numerico e somar as horas por aluno.
-4. Registrar o historico de envios para evitar repeticao.
+1. Implementar login do aluno e uma area logada com as inscricoes dele.
+2. Registrar historico de envios para evitar repeticao.
+3. Coletar telefone no cadastro e ativar o canal de SMS.
+4. Somar as horas acumuladas por aluno e mostrar o progresso em relacao a exigencia do curso.
+5. Paginar as listagens de eventos.
 
 ## Fontes, componentes de terceiros e uso de IA
 
