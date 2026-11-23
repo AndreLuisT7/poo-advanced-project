@@ -48,9 +48,11 @@ public class SecurityConfig {
                         .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**",
                                 "/favicon.ico", "/error").permitAll()
 
-                        // o aluno se cadastra e cancela a propria assinatura sem login
+                        // o aluno se cadastra, entra e liga/desliga a propria assinatura (com e-mail e senha)
                         .requestMatchers(HttpMethod.POST, "/api/alunos").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/assinaturas/cancelar").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/assinaturas/ativar").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/alunos/login").permitAll()
 
                         // o portal lista eventos e instituicoes publicamente
                         .requestMatchers(HttpMethod.GET, "/api/eventos/**").permitAll()

@@ -139,7 +139,9 @@ Rotas publicas, usadas pelo portal:
 | Metodo | Rota | O que faz |
 |---|---|---|
 | POST | `/api/alunos` | Cadastra um aluno e ativa a assinatura |
+| POST | `/api/alunos/login` | O aluno entra com e-mail e senha (sem sessao: o portal reenvia as credenciais a cada acao) |
 | POST | `/api/assinaturas/cancelar` | O proprio aluno cancela, informando e-mail e senha |
+| POST | `/api/assinaturas/ativar` | O proprio aluno religa o informativo, informando e-mail e senha |
 | GET | `/api/eventos` | Lista os eventos |
 | GET | `/api/eventos?proximos=true` | Lista apenas os eventos futuros |
 | GET | `/api/eventos/{id}` | Consulta um evento |
@@ -373,9 +375,15 @@ cd poo-advanced-project
 
 ## Limitacoes conhecidas
 
-- Nao existe login do aluno. A senha e gravada em BCrypt no cadastro e e usada para o aluno
-  cancelar a propria assinatura, mas nao ha sessao nem area logada. As rotas que expoem dados
-  pessoais ficam restritas ao papel `ADMIN`.
+- O login do aluno (`POST /api/alunos/login`) so confere e-mail e senha (BCrypt). Nao ha
+  sessao nem token no servidor: o portal guarda as credenciais apenas na memoria da aba e as
+  reenvia ao ligar ou desligar o informativo. As rotas que expoem dados pessoais ficam
+  restritas ao papel `ADMIN`.
+- Nao existe inscricao por evento: o aluno assina o informativo semanal da instituicao, e ele
+  liga ou desliga isso em "Minha assinatura". A API tambem nao tem editar nem excluir evento,
+  so cadastrar (`POST /api/eventos`, papel `ADMIN`).
+- O login do gestor usa HTTP Basic do Spring Security. O portal guarda o cabecalho so na memoria
+  da aba (nunca em localStorage) e a sessao expira em 30 minutos.
 - Os usuarios administrativos sao fixos em memoria (`admin` e `user`), definidos em
   `SecurityConfig`. Nao ha cadastro de administrador.
 - O informativo nao guarda historico de envio, entao dois disparos no mesmo dia mandam o mesmo
@@ -383,14 +391,14 @@ cd poo-advanced-project
 - O canal de SMS esta implementado (`NotificadorSms`) mas nao e o canal ativo. Para usa-lo seria
   preciso trocar qual implementacao de `Notificador` e a primaria, e o cadastro do aluno ainda
   nao coleta telefone.
-- O portal do aluno (login por e-mail, lista de inscricoes) ainda guarda estado apenas no
-  navegador. O cadastro e a listagem de eventos ja vem da API.
+- O portal inteiro (cadastro, login, assinatura, listagem e cadastro de eventos) usa a API; nao
+  resta dado simulado no navegador.
 - A carga horaria e um numero inteiro de horas; nao ha suporte a fracao.
 - Nao ha paginacao nas listagens.
 
 ## Proximos passos
 
-1. Implementar login do aluno e uma area logada com as inscricoes dele.
+1. Inscricao por evento, com area logada e token (JWT) no lugar de reenviar a senha.
 2. Registrar historico de envios para evitar repeticao.
 3. Coletar telefone no cadastro e ativar o canal de SMS.
 4. Somar as horas acumuladas por aluno e mostrar o progresso em relacao a exigencia do curso.
