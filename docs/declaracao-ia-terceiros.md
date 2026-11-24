@@ -4,7 +4,9 @@
 
 **Turma:** (preencher)  **Equipe:** (preencher)
 
-**Integrantes:** (preencher com os nomes completos)
+**Integrantes:** André Luis Ribeiro da Silva Teixeira, Charles Henrique Barbosa Sales, Kiara Toster
+Santos França, Daniel Tambon (completar nome), Gabriel Ferreira (completar nome) e Ricardo
+(completar nome)
 
 ---
 
@@ -14,7 +16,7 @@
 
 | Ferramenta ou modelo | Finalidade ou tarefa | Parte afetada | Revisao e validacao realizadas |
 |---|---|---|---|
-| (preencher) | (preencher) | (preencher) | (preencher) |
+| Claude Opus 5.5 (Anthropic), via Claude Code | Revisao do repositorio frente aos itens de entrega; escrita dos scripts e instrucoes de demonstracao, do roteiro de teste manual e da tabela de estrutura no README; organizacao do registro de validacao a partir do relatorio e da planilha do questionario aplicados pela equipe; correcao dos comandos do roteiro de demonstracao no README. | `demo/`, `tests/README.md`, `docs/problema-validacao.md`, secao de estrutura e roteiro de demonstracao do `README.md` | Os scripts de demonstracao e cada chamada do roteiro de teste foram executados contra a aplicacao no perfil `demo` em 23/11/2026, e `./mvnw test` passou. Os numeros da validacao vieram apenas do relatorio e da planilha da equipe. (A equipe deve completar com a propria revisao.) |
 | (preencher) | (preencher) | (preencher) | (preencher) |
 
 > Cada integrante que usou IA preenche a propria linha. Descreva a tarefa de forma concreta
@@ -72,10 +74,11 @@ compartilhamos dados pessoais, credenciais ou informacoes restritas de forma ind
 
 | Nome completo | Assinatura ou registro de ciencia |
 |---|---|
-| (preencher) | |
-| (preencher) | |
-| (preencher) | |
-| (preencher) | |
-| (preencher) | |
+| André Luis Ribeiro da Silva Teixeira | |
+| Charles Henrique Barbosa Sales | |
+| Kiara Toster Santos França | |
+| Daniel Tambon (completar nome) | |
+| Gabriel Ferreira (completar nome) | |
+| Ricardo (completar nome) | |
 
 **Data:** ____/____/________

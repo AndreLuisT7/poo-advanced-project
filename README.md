@@ -4,6 +4,21 @@ Portal em que o estudante se cadastra uma unica vez, escolhe sua instituicao e p
 receber por e-mail, toda semana, a lista dos eventos que valem horas complementares.
 A assinatura pode ser desligada e religada pelo proprio aluno.
 
+## Estrutura do repositorio e itens da entrega
+
+| Item | Onde esta |
+|---|---|
+| Codigo-fonte | [`poo-advanced-project/src/main`](poo-advanced-project/src/main) (back-end Spring Boot e o portal em `resources/static/index.html`) |
+| Testes | [`tests/`](tests/README.md) explica e lista os testes automatizados, que ficam em [`poo-advanced-project/src/test`](poo-advanced-project/src/test), e traz um roteiro de teste manual |
+| Demonstracao | [`demo/`](demo/README.md): instrucoes e scripts (`demo.ps1` e `demo.sh`) que percorrem o fluxo principal |
+| Validacao | [`docs/problema-validacao.md`](docs/problema-validacao.md), com o relatorio e as respostas do questionario em [`docs/validacao/`](docs/validacao) |
+| Definicao do MVP | [`docs/definicao-mvp.md`](docs/definicao-mvp.md) |
+| Pitch | [`docs/pitch.pdf`](docs/pitch.pdf) |
+| Declaracao de IA e terceiros | [`docs/declaracao-ia-terceiros.md`](docs/declaracao-ia-terceiros.md) |
+
+O projeto Maven fica na pasta `poo-advanced-project/`, por isso o codigo e os testes seguem a
+estrutura padrao do Maven (`src/main` e `src/test`) dentro dela.
+
 ## Problema e publico
 
 **Publico:** estudantes de graduacao que precisam cumprir carga horaria de atividades
@@ -23,16 +38,16 @@ filtrada pela instituicao dele e com a carga horaria de cada evento.
 
 ## Integrantes e turma
 
-> ATENCAO equipe: confiram o nome completo e preencham a turma de cada um antes de enviar.
-> Os nomes abaixo foram preenchidos a partir do grupo e podem estar incompletos.
+> ATENCAO equipe: faltam o nome completo de tres integrantes e a turma de todos.
 
 | Nome completo | Turma |
 |---|---|
-| Daniel Tambon | (preencher) |
-| Andre Luis | (preencher) |
-| Ricardo | (preencher) |
-| Kiara | (preencher) |
-| Gabriel Ferreira | (preencher) |
+| André Luis Ribeiro da Silva Teixeira | (preencher) |
+| Charles Henrique Barbosa Sales | (preencher) |
+| Kiara Toster Santos França | (preencher) |
+| Daniel Tambon (completar nome) | (preencher) |
+| Gabriel Ferreira (completar nome) | (preencher) |
+| Ricardo (completar nome) | (preencher) |
 
 ## Tecnologias
 
@@ -336,24 +351,27 @@ curl -X POST http://localhost:8080/api/alunos -H "Content-Type: application/json
 
 A resposta vem com `assinaturaAtiva: true`.
 
-4. Dispare o informativo sem esperar a segunda-feira:
+4. Dispare o informativo sem esperar a segunda-feira. A rota e administrativa, entao exige o
+   login do gestor:
 
 ```
-curl -X POST http://localhost:8080/api/informativo/enviar
+curl -u admin:admin123 -X POST http://localhost:8080/api/informativo/enviar
 ```
 
 A resposta mostra quantos alunos estavam inscritos, quantos e-mails sairam e quais falharam.
 O e-mail chega com os eventos da proxima semana daquela instituicao, com data, local e
 carga horaria.
 
-5. Mostre que o aluno pode sair da lista:
+5. Mostre que o aluno pode sair da lista, cancelando com o e-mail e a senha do cadastro:
 
 ```
-curl -X PATCH "http://localhost:8080/api/alunos/1/assinatura?ativa=false"
-curl -X POST http://localhost:8080/api/informativo/enviar
+curl -X POST http://localhost:8080/api/assinaturas/cancelar -H "Content-Type: application/json" -d "{\"email\":\"maria@exemplo.com\",\"senha\":\"senha12345\"}"
+curl -u admin:admin123 -X POST http://localhost:8080/api/informativo/enviar
 ```
 
 Agora `alunosInscritos` cai para zero: quem desligou a assinatura nao recebe mais.
+
+Os passos 2 a 5 tambem estao automatizados em [`demo/`](demo/README.md).
 
 No uso normal esse disparo acontece sozinho toda segunda-feira as 8h, pelo agendamento em
 `InformativoSemanalService`. O endpoint manual existe para a demonstracao ao vivo.
