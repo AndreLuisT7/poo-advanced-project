@@ -47,7 +47,7 @@ filtrada pela instituicao dele e com a carga horaria de cada evento.
 | Kiara Toster Santos França | (preencher) |
 | Daniel Tambon (completar nome) | (preencher) |
 | Gabriel Ferreira (completar nome) | (preencher) |
-| Ricardo (completar nome) | (preencher) |
+| Ricardo Boa Ventura de Sousa | (preencher) |
 
 ## Tecnologias
 
@@ -424,4 +424,6 @@ cd poo-advanced-project
 
 ## Fontes, componentes de terceiros e uso de IA
 
-Declarados em [docs/declaracao-ia-terceiros.md](docs/declaracao-ia-terceiros.md).
+Foi usada inteligencia artificial como apoio ao projeto. Os componentes de terceiros, as fontes
+e o detalhamento do uso de IA estao declarados em
+[docs/declaracao-ia-terceiros.md](docs/declaracao-ia-terceiros.md).

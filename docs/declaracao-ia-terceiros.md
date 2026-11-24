@@ -6,7 +6,7 @@
 
 **Integrantes:** André Luis Ribeiro da Silva Teixeira, Charles Henrique Barbosa Sales, Kiara Toster
 Santos França, Daniel Tambon (completar nome), Gabriel Ferreira (completar nome) e Ricardo
-(completar nome)
+Boa Ventura de Sousa
 
 ---
 
@@ -16,14 +16,30 @@ Santos França, Daniel Tambon (completar nome), Gabriel Ferreira (completar nome
 
 | Ferramenta ou modelo | Finalidade ou tarefa | Parte afetada | Revisao e validacao realizadas |
 |---|---|---|---|
-| Claude Opus 5.5 (Anthropic), via Claude Code | Revisao do repositorio frente aos itens de entrega; escrita dos scripts e instrucoes de demonstracao, do roteiro de teste manual e da tabela de estrutura no README; organizacao do registro de validacao a partir do relatorio e da planilha do questionario aplicados pela equipe; correcao dos comandos do roteiro de demonstracao no README. | `demo/`, `tests/README.md`, `docs/problema-validacao.md`, secao de estrutura e roteiro de demonstracao do `README.md` | Os scripts de demonstracao e cada chamada do roteiro de teste foram executados contra a aplicacao no perfil `demo` em 23/11/2026, e `./mvnw test` passou. Os numeros da validacao vieram apenas do relatorio e da planilha da equipe. (A equipe deve completar com a propria revisao.) |
+| Claude Opus 5.5 e Claude Sonnet 5.5 (Anthropic), usados por meio do Claude Code | Revisao do repositorio frente aos itens obrigatorios da entrega, com lista dos problemas encontrados (portal sem uso da API, envio agendado com erro, teste que dependia do Postgres, rotas administrativas abertas, senha de e-mail no historico, entre outros). | Nenhuma alteracao de codigo; resultado foi uma lista de problemas e recomendacoes. | Os problemas foram reproduzidos subindo a aplicacao, rodando `./mvnw test` e fazendo requisicoes HTTP, em 22 e 23/11/2026. |
+| Claude (mesmas ferramentas) | Implementacao dos endpoints `GET /api/eventos` e `GET /api/instituicoes` na branch `feature/listagem-eventos-instituicoes`. | Somente essa branch, que **nao foi incorporada ao `main`**: a mesma funcionalidade ja havia sido feita por outro integrante. | O projeto foi compilado e os endpoints foram exercitados em um teste de integracao temporario com banco em memoria, depois removido. |
+| Claude (mesmas ferramentas) | Escrita dos scripts de demonstracao (`demo/demo.ps1` e `demo/demo.sh`), de `demo/README.md` e do roteiro de teste manual (`tests/README.md`). | Pastas `demo/` e `tests/`. | Os dois scripts foram executados contra a aplicacao no perfil `demo` e terminam com sucesso. Cada resposta HTTP listada no roteiro manual foi conferida na aplicacao rodando. `./mvnw test` passou com 12 testes. |
+| Claude (mesmas ferramentas) | Redacao da tabela "Estrutura do repositorio e itens da entrega" e correcao do roteiro de demonstracao do `README.md` (os comandos sem login recebiam 401 porque as rotas passaram a exigir o papel ADMIN). | `README.md`. | Os comandos corrigidos foram executados na aplicacao e retornaram o resultado descrito. |
+| Claude (mesmas ferramentas) | Organizacao e redacao de `docs/problema-validacao.md` a partir do relatorio e da planilha do questionario e do pitch fornecidos pela equipe. A IA nao coletou, gerou nem estimou dados de validacao. | `docs/problema-validacao.md`. | Os numeros foram transcritos do relatorio e da planilha da equipe. A equipe deve conferir o texto contra essas fontes antes da entrega. |
+| Claude (mesmas ferramentas) | Merge da branch `feature/front-integracao-api` no `main`, remocao da pasta `.idea/` do versionamento e inclusao do `.gitattributes`. | Historico do repositorio (commits `7e46b85` e `46b289b`). | O merge foi feito em uma copia separada do repositorio, sem conflitos. Foram rodados os 12 testes e o portal foi testado no navegador (login do gestor e cadastro de evento gravado no banco). |
 | (preencher) | (preencher) | (preencher) | (preencher) |
 
 > Cada integrante que usou IA preenche a propria linha. Descreva a tarefa de forma concreta
 > (ex: "geracao do servico de envio semanal") e diga como conferiu o resultado
 > (ex: "li o codigo, rodei a aplicacao e testei o endpoint").
 
-**Observacoes sobre o uso de IA:** (preencher)
+**Observacoes sobre o uso de IA:**
+
+- As linhas acima descrevem o uso da ferramenta Claude registrado nesta etapa de revisao e
+  fechamento da entrega (22 e 23/11/2026). O uso de IA por outros integrantes em outras partes
+  do projeto deve ser acrescentado, uma linha por pessoa, na linha em branco da tabela.
+- A IA nao definiu o problema, o publico nem a solucao, e nao coletou nem aplicou o
+  questionario. O relatorio, a planilha e o pitch foram fornecidos pela equipe e apenas lidos
+  pela ferramenta.
+- Os arquivos de validacao lidos pela IA nao continham nome nem e-mail dos respondentes.
+- Os commits feitos com apoio da IA trazem a linha `Co-Authored-By: Claude` na mensagem.
+- Como qualquer saida de IA, o conteudo pode conter erros. Por isso cada alteracao foi
+  executada e testada, mas a equipe deve revisar o que sera entregue.
 
 ---
 
@@ -79,6 +95,6 @@ compartilhamos dados pessoais, credenciais ou informacoes restritas de forma ind
 | Kiara Toster Santos França | |
 | Daniel Tambon (completar nome) | |
 | Gabriel Ferreira (completar nome) | |
-| Ricardo (completar nome) | |
+| Ricardo Boa Ventura de Sousa | |
 
 **Data:** ____/____/________
