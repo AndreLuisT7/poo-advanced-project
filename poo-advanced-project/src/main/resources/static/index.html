@@ -61,6 +61,7 @@
             <nav class="hidden md:flex items-center gap-1" aria-label="Navegação principal">
                 <button type="button" onclick="mudarVisao('aluno')" data-nav="aluno" class="nav-link"><i class="fa-solid fa-house text-xs"></i> Início</button>
                 <button type="button" onclick="acaoAluno()" data-nav="login-aluno" class="nav-link"><i class="fa-solid fa-user-graduate text-xs"></i> <span class="rotulo-aluno">Login Aluno</span></button>
+                <button type="button" onclick="mudarVisao('assinatura')" data-nav="assinatura" class="nav-link"><i class="fa-solid fa-envelope-circle-check text-xs"></i> Minha assinatura</button>
                 <a href="#inscricao" onclick="irParaInscricao(event)" class="bg-emerald-500 hover:bg-emerald-400 text-white transition px-4 py-2 rounded-lg text-sm font-bold inline-flex items-center gap-2 mx-1"><i class="fa-solid fa-user-plus text-xs"></i> Cadastrar</a>
                 <span class="w-px h-6 bg-white/20 mx-1" aria-hidden="true"></span>
                 <button type="button" onclick="mudarVisao('login-admin')" data-nav="login-admin" data-so-visitante class="nav-link border border-white/20"><i class="fa-solid fa-lock text-xs"></i> Área do Gestor</button>
@@ -79,6 +80,7 @@
             <nav class="px-4 py-4 space-y-1" aria-label="Menu mobile">
                 <button type="button" onclick="mudarVisao('aluno')" data-nav="aluno" class="nav-link w-full !py-3"><i class="fa-solid fa-house w-5 text-center"></i> Início</button>
                 <button type="button" onclick="acaoAluno()" data-nav="login-aluno" class="nav-link w-full !py-3"><i class="fa-solid fa-user-graduate w-5 text-center"></i> <span class="rotulo-aluno">Login Aluno</span></button>
+                <button type="button" onclick="mudarVisao('assinatura')" data-nav="assinatura" class="nav-link w-full !py-3"><i class="fa-solid fa-envelope-circle-check w-5 text-center"></i> Minha assinatura</button>
                 <a href="#inscricao" onclick="irParaInscricao(event)" class="bg-emerald-500 hover:bg-emerald-400 text-white transition px-3.5 py-3 rounded-lg text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-user-plus w-5 text-center"></i> Cadastrar</a>
                 <div class="h-px bg-white/10 my-2"></div>
                 <button type="button" onclick="mudarVisao('login-admin')" data-nav="login-admin" data-so-visitante class="nav-link w-full !py-3"><i class="fa-solid fa-lock w-5 text-center"></i> Área do Gestor</button>
@@ -140,7 +142,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
                     <div>
                         <h3 class="text-2xl font-bold text-slate-900">Próximos eventos disponíveis</h3>
-                        <p id="subtitulo-eventos" class="text-sm text-slate-500 mt-1">Faça login como aluno para ver suas inscrições salvas.</p>
+                        <p id="subtitulo-eventos" class="text-sm text-slate-500 mt-1">Entre como aluno para gerenciar o seu informativo semanal.</p>
                     </div>
                     <button type="button" onclick="atualizarEventosAnimado()" class="self-start sm:self-auto text-blue-700 hover:text-blue-900 text-sm font-semibold flex items-center gap-2 bg-blue-50 hover:bg-blue-100 px-4 py-2.5 rounded-xl transition">
                         <i id="icone-atualizar" class="fa-solid fa-rotate"></i> Atualizar
@@ -157,10 +159,10 @@
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-4"><i class="fa-solid fa-bell text-xl"></i></div>
                         <h3 class="text-2xl sm:text-3xl font-bold text-slate-900">Receba alertas de eventos</h3>
-                        <p class="text-slate-600 mt-3">Cadastre seus dados e avisamos quando um novo evento com horas complementares for publicado.</p>
+                        <p class="text-slate-600 mt-3">Cadastre-se para receber, toda semana, os eventos com horas complementares da sua instituição.</p>
                         <ul class="mt-5 space-y-2 text-sm text-slate-600">
                             <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Notificações por e-mail acadêmico</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Aviso opcional pelo WhatsApp</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Informativo toda segunda-feira, às 8h</li>
                         </ul>
                     </div>
                     <div class="bg-slate-50 p-6 sm:p-8 rounded-3xl border border-slate-200">
@@ -209,20 +211,59 @@
                         <i class="fa-solid fa-user-graduate text-xl"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-slate-900">Portal do Aluno</h3>
-                    <p class="text-sm text-slate-500 mt-1">Informe seu e-mail para carregar suas inscrições.</p>
+                    <p class="text-sm text-slate-500 mt-1">Entre com o e-mail e a senha do seu cadastro.</p>
                 </div>
                 <form onsubmit="fazerLoginAluno(event)" class="space-y-4">
                     <div>
                         <label for="login-aluno-email" class="rotulo">E-mail acadêmico</label>
                         <input type="email" id="login-aluno-email" required autocomplete="email" class="campo" placeholder="aluno@ucsal.edu.br">
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow text-sm">
-                        Acessar minhas inscrições
+                    <div>
+                        <label for="login-aluno-senha" class="rotulo">Senha</label>
+                        <input type="password" id="login-aluno-senha" required autocomplete="current-password" class="campo" placeholder="Sua senha">
+                    </div>
+                    <div id="erro-login-aluno" class="hidden" role="alert"></div>
+                    <button type="submit" id="btn-login-aluno" class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition shadow text-sm">
+                        Entrar
                     </button>
                 </form>
-                <div class="mt-5 text-center">
-                    <button type="button" onclick="mudarVisao('aluno')" class="text-sm text-blue-600 hover:underline">Voltar para a página inicial</button>
+                <div class="mt-5 text-center space-y-2">
+                    <button type="button" onclick="irParaInscricao(event)" class="block w-full text-sm text-blue-600 hover:underline">Ainda não tenho cadastro</button>
+                    <button type="button" onclick="mudarVisao('aluno')" class="block w-full text-sm text-slate-500 hover:underline">Voltar para a página inicial</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- ============ MINHA ASSINATURA ============ -->
+        <div id="view-assinatura" class="hidden max-w-2xl mx-auto px-4 py-12 sm:py-16 space-y-6">
+            <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="fa-solid fa-envelope-circle-check text-xl"></i></div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Minha assinatura</h3>
+                        <p class="text-sm text-slate-500">Informativo semanal de eventos por e-mail.</p>
+                    </div>
+                </div>
+                <div id="painel-assinatura"></div>
+            </div>
+
+            <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900">Cancelar o informativo</h3>
+                <p class="text-sm text-slate-500 mt-1">Não quer mais receber? Informe o e-mail e a senha do cadastro. Não é preciso entrar na conta.</p>
+                <form onsubmit="cancelarAssinatura(event)" class="space-y-4 mt-5">
+                    <div>
+                        <label for="cancelar-email" class="rotulo">E-mail acadêmico</label>
+                        <input type="email" id="cancelar-email" required autocomplete="email" class="campo" placeholder="aluno@ucsal.edu.br">
+                    </div>
+                    <div>
+                        <label for="cancelar-senha" class="rotulo">Senha</label>
+                        <input type="password" id="cancelar-senha" required autocomplete="current-password" class="campo" placeholder="Sua senha">
+                    </div>
+                    <div id="status-cancelar" class="hidden" role="status"></div>
+                    <button type="submit" id="btn-cancelar-assinatura" class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition shadow text-sm">
+                        Cancelar assinatura
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -234,12 +275,12 @@
                         <i class="fa-solid fa-lock text-xl"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-slate-900">Acesso restrito</h3>
-                    <p class="text-sm text-slate-500 mt-1">Credenciais do painel administrativo.</p>
+                    <p class="text-sm text-slate-500 mt-1">Entre com o usuário e a senha de administrador do sistema.</p>
                 </div>
                 <form onsubmit="fazerLoginAdmin(event)" class="space-y-4" autocomplete="off">
                     <div>
-                        <label for="login-user" class="rotulo">Usuário / e-mail</label>
-                        <input type="text" id="login-user" required autocomplete="off" class="campo" placeholder="admin@ucsal.br">
+                        <label for="login-user" class="rotulo">Usuário</label>
+                        <input type="text" id="login-user" required autocomplete="off" class="campo" placeholder="usuário do gestor">
                     </div>
                     <div>
                         <label for="login-pass" class="rotulo">Senha</label>
@@ -267,7 +308,7 @@
                 <div>
                     <span class="inline-flex items-center gap-2 bg-amber-500 text-slate-950 font-bold text-xs px-2.5 py-1 rounded-md"><i class="fa-solid fa-shield-halved"></i> Sessão autenticada</span>
                     <h2 class="text-xl sm:text-2xl font-bold mt-2">Gestão de Eventos UCSAL</h2>
-                    <p class="text-sm text-slate-400">Adicione, edite ou remova eventos do sistema.</p>
+                    <p class="text-sm text-slate-400">Cadastre eventos direto no banco de dados da API.</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3">
                     <button type="button" onclick="abrirModalCriar()" class="bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-5 py-3 rounded-xl shadow transition flex items-center justify-center gap-2 text-sm">
@@ -293,7 +334,7 @@
                                 <th class="py-3 px-4 font-semibold">Título do evento</th>
                                 <th class="py-3 px-4 font-semibold">Categoria / horas</th>
                                 <th class="py-3 px-4 font-semibold">Data e hora</th>
-                                <th class="py-3 px-4 font-semibold text-right">Ações</th>
+                                <th class="py-3 px-4 font-semibold">Local</th>
                             </tr>
                         </thead>
                         <tbody id="tabela-admin-body" class="divide-y divide-slate-100 text-sm"></tbody>
@@ -317,11 +358,10 @@
     <div id="modal-evento" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4 z-50" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
         <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full p-6 shadow-xl max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-5">
-                <h3 id="modal-titulo" class="text-lg font-bold text-slate-900">Adicionar novo evento</h3>
+                <h3 id="modal-titulo" class="text-lg font-bold text-slate-900">Novo evento</h3>
                 <button type="button" onclick="fecharModal()" class="w-10 h-10 -mr-2 text-slate-400 hover:text-slate-600" aria-label="Fechar"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form id="form-evento-admin" onsubmit="salvarEventoAdmin(event)" class="space-y-4">
-                <input type="hidden" id="evento-id">
                 <div>
                     <label for="adm-titulo" class="rotulo">Nome do evento</label>
                     <input type="text" id="adm-titulo" required maxlength="120" class="campo" placeholder="Ex: Hackathon de IA">
@@ -329,35 +369,37 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="adm-categoria" class="rotulo">Categoria</label>
-                        <input type="text" id="adm-categoria" required maxlength="60" class="campo" placeholder="Hackathon • 20h">
+                        <input type="text" id="adm-categoria" required maxlength="60" class="campo" placeholder="Palestra, Oficina, Hackathon...">
                     </div>
                     <div>
-                        <label for="adm-data" class="rotulo">Data e hora</label>
-                        <input type="text" id="adm-data" required maxlength="60" class="campo" placeholder="15 Out, 14:00">
+                        <label for="adm-horas" class="rotulo">Carga horária (h)</label>
+                        <input type="number" id="adm-horas" required min="1" step="1" class="campo" placeholder="4">
                     </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="adm-data" class="rotulo">Data e hora</label>
+                        <input type="datetime-local" id="adm-data" required class="campo">
+                    </div>
+                    <div>
+                        <label for="adm-local" class="rotulo">Local</label>
+                        <input type="text" id="adm-local" required maxlength="120" class="campo" placeholder="Auditório Central">
+                    </div>
+                </div>
+                <div>
+                    <label for="adm-instituicao" class="rotulo">Instituição</label>
+                    <select id="adm-instituicao" required class="campo"></select>
                 </div>
                 <div>
                     <label for="adm-descricao" class="rotulo">Descrição</label>
                     <textarea id="adm-descricao" rows="3" required maxlength="400" class="campo" placeholder="Detalhes do evento..."></textarea>
                 </div>
+                <div id="erro-evento" class="hidden" role="alert"></div>
                 <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
                     <button type="button" onclick="fecharModal()" class="px-5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition shadow">Salvar evento</button>
+                    <button type="submit" id="btn-salvar-evento" class="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-bold px-6 py-3 rounded-xl text-sm transition shadow">Salvar evento</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <!-- ============ MODAL CONFIRMAR EXCLUSÃO ============ -->
-    <div id="modal-excluir" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50" role="alertdialog" aria-modal="true" aria-labelledby="excluir-titulo">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl text-center">
-            <div class="inline-flex w-14 h-14 rounded-2xl bg-red-100 text-red-600 items-center justify-center mb-3"><i class="fa-solid fa-trash text-xl"></i></div>
-            <h3 id="excluir-titulo" class="text-lg font-bold text-slate-900">Excluir evento?</h3>
-            <p id="excluir-texto" class="text-sm text-slate-600 mt-2"></p>
-            <div class="flex gap-2 mt-6">
-                <button type="button" onclick="fecharModalExcluir()" class="flex-1 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
-                <button type="button" onclick="confirmarExclusao()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-3 rounded-xl text-sm transition">Excluir</button>
-            </div>
         </div>
     </div>
 
@@ -367,109 +409,113 @@
     <!-- ============ SCRIPTS ============ -->
     <script>
         /* =====================================================================
-           CONFIGURAÇÃO (simula o carregamento de um arquivo .env)
+           CONFIGURAÇÃO
            ---------------------------------------------------------------------
-           Em um projeto real com backend (Node/Express, por exemplo), o arquivo
-           .env ficaria SÓ no servidor, fora do Git (.gitignore):
-
-               ADMIN_USER=admin@ucsal.br
-               ADMIN_PASS=Ucsal@2026
-
-           e a validação do login aconteceria em POST /api/admin/login, com
-           a senha guardada como hash (bcrypt/argon2) e sessão via cookie
-           httpOnly ou JWT.
-
-           Aqui, como é apenas front-end, simulamos esse .env guardando apenas
-           o HASH SHA-256 das credenciais (nunca o texto puro). Para trocar,
-           gere novos hashes no console:  await gerarHash('novo-valor')
+           O portal é servido pelo próprio Spring (src/main/resources/static),
+           então a API está na MESMA origem: basta o caminho relativo "/api".
+           Não existe mais usuário/senha de administrador neste arquivo: o login
+           do gestor é validado pelo Spring Security (HTTP Basic). As credenciais
+           ficam só no back-end (SecurityConfig) e aqui apenas na memória da aba.
            ===================================================================== */
-        const ENV = Object.freeze({
-            ADMIN_USER_SHA256: 'a1837482128b4141b34f6d7103a259c264f8d07536c9e6cb7d7eddb4e4c3d9f0',
-            ADMIN_PASS_SHA256: '1f04ae43207afb80b65a3aa03763f8c668680b90241b8d4acbe0bcf6be2cc347',
-            SESSAO_MINUTOS: 30,
-            MAX_TENTATIVAS: 3,
-            BLOQUEIO_SEGUNDOS: 30
-        });
-
         const API_URL = '/api';
+        const SESSAO_MINUTOS = 30;       // validade da sessão do gestor nesta aba
+        const MAX_TENTATIVAS = 3;        // bloqueio visual contra tentativas repetidas
+        const BLOQUEIO_SEGUNDOS = 30;
 
-        async function gerarHash(texto) {
-            if (!window.crypto || !crypto.subtle) throw new Error('crypto.subtle indisponível (use https ou localhost).');
-            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
-            return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+        /* ---------- Chamadas à API ---------- */
+        async function api(caminho, { metodo = 'GET', corpo, autorizacao } = {}) {
+            const headers = { 'X-Requested-With': 'XMLHttpRequest' }; // 401 sem pop-up do navegador
+            if (corpo !== undefined) headers['Content-Type'] = 'application/json';
+            if (autorizacao) headers['Authorization'] = autorizacao;
+            const resposta = await fetch(API_URL + caminho, {
+                method: metodo,
+                headers,
+                credentials: 'omit',
+                body: corpo !== undefined ? JSON.stringify(corpo) : undefined
+            });
+            let dados = null;
+            try { dados = await resposta.json(); } catch (_) { /* corpo vazio */ }
+            return { ok: resposta.ok, status: resposta.status, dados };
         }
 
-        function iguais(a, b) { // comparação sem "saída antecipada"
-            if (a.length !== b.length) return false;
-            let r = 0;
-            for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
-            return r === 0;
+        function mensagemDeErro(r, padrao) {
+            const d = r.dados;
+            if (d && typeof d === 'object') {
+                if (d.erro) return d.erro;
+                const partes = Object.values(d).filter(v => typeof v === 'string');
+                if (partes.length) return partes.join('. ');
+            }
+            return padrao || `Erro ${r.status} ao falar com o servidor.`;
         }
 
-        /* ---------- Módulo de autenticação (estado privado, fora do escopo global) ---------- */
+        function basic(usuario, senha) { // Authorization: Basic base64(usuario:senha), aceita acentos
+            const bytes = new TextEncoder().encode(usuario + ':' + senha);
+            let bin = '';
+            bytes.forEach(b => { bin += String.fromCharCode(b); });
+            return 'Basic ' + btoa(bin);
+        }
+
+        /* ---------- Módulo de autenticação do gestor (estado privado) ---------- */
         const Auth = (() => {
-            let sessao = null;       // { expira }
+            let cabecalho = null;    // "Basic ..." só em memória (nunca em localStorage)
+            let expira = 0;
             let falhas = 0;
             let bloqueadoAte = 0;
 
             return {
                 ativo() {
-                    if (!sessao) return false;
-                    if (Date.now() > sessao.expira) { sessao = null; return false; }
+                    if (!cabecalho) return false;
+                    if (Date.now() > expira) { cabecalho = null; return false; }
                     return true;
                 },
+                autorizacao() { return this.ativo() ? cabecalho : null; },
                 segundosBloqueado() {
                     return Math.max(0, Math.ceil((bloqueadoAte - Date.now()) / 1000));
                 },
+                // Quem decide se a senha está certa é o SERVIDOR: pedimos um recurso
+                // protegido (papel ADMIN). 401 = credencial errada; 403 = usuário sem
+                // papel ADMIN; qualquer outro código (200/404) = autenticado como ADMIN.
                 async entrar(usuario, senha) {
                     if (this.segundosBloqueado() > 0) return { ok: false, bloqueado: true };
-                    const hUser = await gerarHash(usuario.trim().toLowerCase());
-                    const hPass = await gerarHash(senha);
-                    const okUser = iguais(hUser, ENV.ADMIN_USER_SHA256);
-                    const okPass = iguais(hPass, ENV.ADMIN_PASS_SHA256);
-                    if (okUser && okPass) {
+                    const tentativa = basic(usuario.trim(), senha);
+                    const r = await api('/alunos/0', { autorizacao: tentativa });
+                    if (r.status === 403) return { ok: false, semPermissao: true };
+                    if (r.status >= 500) throw new Error('Erro no servidor (' + r.status + ')');
+                    if (r.status !== 401) {
                         falhas = 0;
-                        sessao = { expira: Date.now() + ENV.SESSAO_MINUTOS * 60000 };
+                        cabecalho = tentativa;
+                        expira = Date.now() + SESSAO_MINUTOS * 60000;
                         return { ok: true };
                     }
                     falhas++;
-                    if (falhas >= ENV.MAX_TENTATIVAS) {
+                    if (falhas >= MAX_TENTATIVAS) {
                         falhas = 0;
-                        bloqueadoAte = Date.now() + ENV.BLOQUEIO_SEGUNDOS * 1000;
+                        bloqueadoAte = Date.now() + BLOQUEIO_SEGUNDOS * 1000;
                         return { ok: false, bloqueado: true };
                     }
-                    return { ok: false, restantes: ENV.MAX_TENTATIVAS - falhas };
+                    return { ok: false, restantes: MAX_TENTATIVAS - falhas };
                 },
-                sair() { sessao = null; }
+                sair() { cabecalho = null; expira = 0; }
             };
         })();
 
-        /* ---------- Dados em memória ---------- */
-        let alunoLogado = null;      // e-mail do aluno logado
-        let inscricoesMemoria = [];  // pares { email, eventoId }
-        let alunosMemoria = [];      // cadastros de alertas
-        let idParaExcluir = null;
-
-        let eventosMemoria = [
-            { id: 1, titulo: "I Hackathon de IA Aplicada - Pituaçu", categoria: "Hackathon • 20h Comp.", data: "15 de Outubro, 2026", descricao: "Maratona de programação voltada para criar soluções utilizando inteligência artificial." },
-            { id: 2, titulo: "Arquitetura de Microsserviços e POO", categoria: "Palestra • 4h Comp.", data: "22 de Outubro, 2026", descricao: "Palestra aprofundada sobre como aplicar orientação a objetos em grande escala." }
-        ];
+        /* ---------- Estado da tela (os dados vêm da API) ---------- */
+        let alunoLogado = null;      // resposta de POST /api/alunos/login
+        let credAluno = null;        // { email, senha } só na memória, para ligar/desligar o informativo
+        let eventosMemoria = [];     // próximos eventos (vitrine do aluno)
+        let eventosAdmin = [];       // todos os eventos (painel do gestor)
+        let instituicoes = [];
 
         /* ---------- Utilitários ---------- */
         const $ = (id) => document.getElementById(id);
 
         function esc(valor) { // evita injeção de HTML nos textos digitados
-            return String(valor).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            return String(valor ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
 
-        // o back-end manda categoria e cargaHoraria separados; o formato antigo
-        // juntava os dois com "•", entao aceitamos as duas formas
-        function partirCategoria(evOuCat) {
-            if (evOuCat && typeof evOuCat === 'object') {
-                return { tipo: String(evOuCat.categoria || '').trim(), horas: (evOuCat.horas || 0) + 'h Comp.' };
-            }
-            const partes = String(evOuCat).split('•');
-            return { tipo: partes[0].trim(), horas: (partes[1] || '').trim() };
+        // o back-end manda categoria e cargaHoraria separados
+        function partirCategoria(ev) {
+            return { tipo: String(ev.categoria || '').trim(), horas: ev.horas ? ev.horas + 'h Comp.' : '' };
         }
 
         function iconeDaCategoria(tipo) {
@@ -481,19 +527,24 @@
             return 'fa-calendar-check';
         }
 
-        function horasNumericas(evOuCat) {
-            if (evOuCat && typeof evOuCat === 'object') {
-                return Number(evOuCat.horas) || 0;
-            }
-            const m = String(evOuCat).split('•')[1] || '';
-            const achado = m.match(/(\d+)\s*h/i);
-            return achado ? parseInt(achado[1], 10) : 0;
+        function horasNumericas(ev) { return Number(ev.horas) || 0; }
+
+        function mapearEvento(e) {
+            return {
+                id: e.id,
+                titulo: e.nome,
+                categoria: e.categoria,
+                horas: e.cargaHoraria,
+                local: e.local,
+                data: new Date(e.dataHora).toLocaleString('pt-BR', {
+                    day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                }),
+                descricao: e.descricao
+            };
         }
 
         function toast(mensagem, tipo = 'ok') {
-            const cores = {
-                ok: 'bg-emerald-600', erro: 'bg-red-600', info: 'bg-slate-800'
-            };
+            const cores = { ok: 'bg-emerald-600', erro: 'bg-red-600', info: 'bg-slate-800' };
             const icones = { ok: 'fa-circle-check', erro: 'fa-circle-exclamation', info: 'fa-circle-info' };
             const el = document.createElement('div');
             el.className = `toast pointer-events-auto ${cores[tipo]} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-lg flex items-center gap-3`;
@@ -501,6 +552,16 @@
             el.querySelector('span').textContent = mensagem;
             $('toasts').appendChild(el);
             setTimeout(() => el.remove(), 3500);
+        }
+
+        function aviso(idElemento, mensagem, tipo = 'erro') { // mensagem dentro do formulário
+            const box = $(idElemento);
+            const cores = {
+                erro: 'bg-red-50 text-red-700 border-red-200',
+                ok: 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            };
+            box.className = `border rounded-xl px-4 py-3 text-sm ${cores[tipo]}${mensagem ? '' : ' hidden'}`;
+            box.textContent = mensagem;
         }
 
         /* ---------- Menu hambúrguer ---------- */
@@ -516,7 +577,7 @@
         window.addEventListener('resize', () => { if (window.innerWidth >= 768) alternarMenu(true); });
 
         /* ---------- Navegação entre telas ---------- */
-        const VISOES = ['aluno', 'login-aluno', 'login-admin', 'admin'];
+        const VISOES = ['aluno', 'login-aluno', 'assinatura', 'login-admin', 'admin'];
 
         function mudarVisao(visao) {
             // Rota protegida: o painel só abre com sessão de administrador válida
@@ -528,8 +589,9 @@
             if (visao === 'login-admin' && Auth.ativo()) visao = 'admin';
 
             VISOES.forEach(v => $('view-' + v).classList.toggle('hidden', v !== visao));
-            if (visao === 'admin') renderizarAdmin();
+            if (visao === 'admin') { renderizarAdmin(); carregarEventosAdmin(); }
             else limparAdmin();
+            if (visao === 'assinatura') renderizarAssinatura();
 
             document.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('ativo', b.dataset.nav === visao));
             alternarMenu(true);
@@ -549,10 +611,9 @@
             setTimeout(() => $('inscricao').scrollIntoView({ behavior: 'smooth' }), 60);
         }
 
-        /* ---------- Visão do aluno ---------- */
+        /* ---------- Visão do aluno: eventos ---------- */
         function cardEvento(ev) {
             const { tipo, horas } = partirCategoria(ev);
-            const inscrito = alunoLogado && inscricoesMemoria.some(i => i.email === alunoLogado && i.eventoId === ev.id);
             return `
             <article class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition p-6 flex flex-col">
                 <div class="flex items-start justify-between gap-3 mb-4">
@@ -564,11 +625,9 @@
                 </div>
                 <h4 class="font-bold text-lg text-slate-900 leading-snug">${esc(ev.titulo)}</h4>
                 <p class="text-sm text-slate-600 mt-2 flex-1">${esc(ev.descricao)}</p>
-                <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
-                    <span class="text-sm text-slate-600 font-medium flex items-center gap-2"><i class="fa-regular fa-calendar text-blue-600"></i> ${esc(ev.data)}</span>
-                    <button type="button" onclick="alternarInscricao(${ev.id})" class="text-sm font-bold px-4 py-2 rounded-lg transition ${inscrito ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-blue-600 text-white hover:bg-blue-700'}">
-                        ${inscrito ? '<i class="fa-solid fa-check"></i> Inscrito' : 'Inscreva-se'}
-                    </button>
+                <div class="mt-5 pt-4 border-t border-slate-100 space-y-1.5 text-sm text-slate-600 font-medium">
+                    <p class="flex items-center gap-2"><i class="fa-regular fa-calendar text-blue-600 w-4"></i> ${esc(ev.data)}</p>
+                    ${ev.local ? `<p class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-blue-600 w-4"></i> ${esc(ev.local)}</p>` : ''}
                 </div>
             </article>`;
         }
@@ -584,12 +643,9 @@
                    </div>`;
 
             const sub = $('subtitulo-eventos');
-            if (alunoLogado) {
-                const n = inscricoesMemoria.filter(i => i.email === alunoLogado).length;
-                sub.textContent = `Conectado como ${alunoLogado} · ${n} inscrição(ões) salva(s).`;
-            } else {
-                sub.textContent = 'Faça login como aluno para ver suas inscrições salvas.';
-            }
+            sub.textContent = alunoLogado
+                ? `Conectado como ${alunoLogado.nomeCompleto || alunoLogado.email || 'aluno'} · informativo ${alunoLogado.assinaturaAtiva ? 'ativo' : 'desativado'}.`
+                : 'Entre como aluno para gerenciar o seu informativo semanal.';
             renderizarDestaque();
         }
 
@@ -606,28 +662,28 @@
             $('hero-horas').textContent = horas || tipo;
         }
 
-        function alternarInscricao(eventoId) {
-            if (!alunoLogado) {
-                toast('Faça login como aluno para se inscrever.', 'info');
-                mudarVisao('login-aluno');
-                return;
+        async function carregarEventos() {
+            try {
+                const r = await api('/eventos?proximos=true');
+                if (!r.ok) throw new Error('status ' + r.status);
+                eventosMemoria = r.dados.map(mapearEvento);
+                renderizarEventosAluno();
+                return true;
+            } catch (erro) {
+                toast('Não foi possível carregar os eventos do servidor.', 'erro');
+                return false;
             }
-            const idx = inscricoesMemoria.findIndex(i => i.email === alunoLogado && i.eventoId === eventoId);
-            if (idx >= 0) { inscricoesMemoria.splice(idx, 1); toast('Inscrição cancelada.', 'info'); }
-            else { inscricoesMemoria.push({ email: alunoLogado, eventoId }); toast('Inscrição confirmada!'); }
-            renderizarEventosAluno();
         }
 
-        function atualizarEventosAnimado() {
+        async function atualizarEventosAnimado() {
             const icone = $('icone-atualizar');
             icone.classList.add('animate-spin');
-            setTimeout(() => {
-                renderizarEventosAluno();
-                icone.classList.remove('animate-spin');
-                toast('Lista de eventos atualizada.', 'info');
-            }, 700);
+            const ok = await carregarEventos();
+            icone.classList.remove('animate-spin');
+            if (ok) toast('Lista de eventos atualizada.', 'info');
         }
 
+        /* ---------- Cadastro do aluno ---------- */
         async function enviarCadastro(e) {
             e.preventDefault();
             const status = $('status-mensagem');
@@ -644,26 +700,20 @@
             };
 
             try {
-                const resposta = await fetch(API_URL + '/alunos', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(corpo)
-                });
-                const dados = await resposta.json();
-
-                if (resposta.ok) {
+                const r = await api('/alunos', { metodo: 'POST', corpo });
+                if (r.ok) {
                     status.className = 'mt-3 text-center text-sm font-medium text-emerald-600';
-                    status.textContent = 'Inscricao concluida! Voce recebera o informativo toda semana.';
+                    status.textContent = 'Inscrição concluída! Você receberá o informativo toda semana.';
                     toast('Cadastro realizado com sucesso!');
                     $('form-cadastro').reset();
-                    await carregarInstituicoes();
+                    preencherInstituicoes();
                 } else {
                     status.className = 'mt-3 text-center text-sm font-medium text-amber-600';
-                    status.textContent = dados.erro || Object.values(dados).join('. ');
+                    status.textContent = mensagemDeErro(r);
                 }
             } catch (erro) {
                 status.className = 'mt-3 text-center text-sm font-medium text-red-600';
-                status.textContent = 'Nao foi possivel falar com o servidor. Ele esta rodando?';
+                status.textContent = 'Não foi possível falar com o servidor. Ele está rodando?';
             } finally {
                 botao.disabled = false;
                 setTimeout(() => { status.textContent = ''; }, 6000);
@@ -671,53 +721,51 @@
         }
 
         async function carregarInstituicoes() {
-            const select = $('instituicao');
-            if (!select) return;
             try {
-                const resposta = await fetch(API_URL + '/instituicoes');
-                const lista = await resposta.json();
-                select.innerHTML = lista
-                    .map(i => `<option value="${i.id}">${esc(i.nome)} (${esc(i.sigla)})</option>`)
-                    .join('');
+                const r = await api('/instituicoes');
+                instituicoes = r.ok ? r.dados : [];
             } catch (erro) {
-                select.innerHTML = '<option value="">Servidor indisponivel</option>';
+                instituicoes = [];
             }
+            preencherInstituicoes();
         }
 
-        async function carregarEventos() {
-            try {
-                const resposta = await fetch(API_URL + '/eventos?proximos=true');
-                if (!resposta.ok) return;
-                eventosMemoria = (await resposta.json()).map(e => ({
-                    id: e.id,
-                    titulo: e.nome,
-                    categoria: e.categoria,
-                    horas: e.cargaHoraria,
-                    data: new Date(e.dataHora).toLocaleString('pt-BR', {
-                        day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                    }),
-                    descricao: e.descricao
-                }));
-                renderizarEventosAluno();
-                renderizarDestaque();
-            } catch (erro) {
-                toast('Nao foi possivel carregar os eventos do servidor.', 'erro');
-            }
+        function preencherInstituicoes() {
+            const opcoes = instituicoes.length
+                ? instituicoes.map(i => `<option value="${i.id}">${esc(i.nome)} (${esc(i.sigla)})</option>`).join('')
+                : '<option value="">Servidor indisponível</option>';
+            ['instituicao', 'adm-instituicao'].forEach(id => { if ($(id)) $(id).innerHTML = opcoes; });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            carregarInstituicoes();
-            carregarEventos();
-        });
-
-        function fazerLoginAluno(e) {
+        /* ---------- Login do aluno e assinatura do informativo ---------- */
+        async function fazerLoginAluno(e) {
             e.preventDefault();
-            alunoLogado = $('login-aluno-email').value.trim().toLowerCase();
-            $('login-aluno-email').value = '';
-            atualizarEstadoAluno();
-            renderizarEventosAluno();
-            mudarVisao('aluno');
-            toast('Bem-vindo! Suas inscrições foram carregadas.');
+            const btn = $('btn-login-aluno');
+            aviso('erro-login-aluno', '');
+            btn.disabled = true;
+            const email = $('login-aluno-email').value.trim().toLowerCase();
+            const senha = $('login-aluno-senha').value;
+            try {
+                const r = await api('/alunos/login', { metodo: 'POST', corpo: { email, senha } });
+                $('login-aluno-senha').value = '';
+                if (r.ok) {
+                    alunoLogado = r.dados;
+                    credAluno = { email, senha };
+                    $('login-aluno-email').value = '';
+                    atualizarEstadoAluno();
+                    renderizarEventosAluno();
+                    toast('Bem-vindo(a)! Você entrou como aluno.');
+                    mudarVisao('assinatura');
+                } else if (r.status === 401) {
+                    aviso('erro-login-aluno', 'E-mail ou senha inválidos.');
+                } else {
+                    aviso('erro-login-aluno', mensagemDeErro(r, 'Não foi possível entrar agora.'));
+                }
+            } catch (erro) {
+                aviso('erro-login-aluno', 'Não foi possível falar com o servidor. Ele está rodando?');
+            } finally {
+                btn.disabled = false;
+            }
         }
 
         function acaoAluno() {
@@ -727,6 +775,7 @@
 
         function sairAluno() {
             alunoLogado = null;
+            credAluno = null;
             atualizarEstadoAluno();
             renderizarEventosAluno();
             mudarVisao('aluno');
@@ -741,6 +790,85 @@
             banner.innerHTML = alunoLogado
                 ? '<i class="fa-solid fa-circle-check"></i> Aluno conectado'
                 : '<i class="fa-solid fa-graduation-cap"></i> Expositor Acadêmico';
+        }
+
+        function renderizarAssinatura() {
+            const box = $('painel-assinatura');
+            if (!alunoLogado) {
+                box.innerHTML = `
+                    <p class="text-sm text-slate-600">Entre como aluno para ver e alterar o seu informativo semanal.</p>
+                    <button type="button" onclick="mudarVisao('login-aluno')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-xl text-sm transition shadow">Entrar como aluno</button>`;
+                return;
+            }
+            const ativa = !!alunoLogado.assinaturaAtiva;
+            box.innerHTML = `
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                        <p class="font-bold text-slate-900">${esc(alunoLogado.nomeCompleto || alunoLogado.email || 'Aluno')}</p>
+                        <p class="text-sm text-slate-500">${esc(alunoLogado.email || '')}</p>
+                    </div>
+                    <span class="text-xs font-bold px-3 py-1.5 rounded-full ${ativa ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}">
+                        ${ativa ? 'Informativo ATIVO' : 'Informativo DESATIVADO'}
+                    </span>
+                </div>
+                <p class="text-sm text-slate-600 mt-3">${ativa
+                    ? 'Toda segunda-feira, às 8h, você recebe por e-mail os eventos da semana.'
+                    : 'Você não recebe mais o informativo semanal.'}</p>
+                <button type="button" id="btn-alternar-assinatura" onclick="alternarAssinatura()" class="mt-4 font-bold px-5 py-3 rounded-xl text-sm transition shadow ${ativa ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}">
+                    ${ativa ? 'Desativar informativo' : 'Reativar informativo'}
+                </button>`;
+        }
+
+        async function alternarAssinatura() {
+            if (!alunoLogado || !credAluno) { mudarVisao('login-aluno'); return; }
+            const btn = $('btn-alternar-assinatura');
+            btn.disabled = true;
+            const caminho = alunoLogado.assinaturaAtiva ? '/assinaturas/cancelar' : '/assinaturas/ativar';
+            try {
+                const r = await api(caminho, { metodo: 'POST', corpo: { email: credAluno.email, senha: credAluno.senha } });
+                if (r.ok) {
+                    alunoLogado = { ...alunoLogado, ...r.dados };
+                    toast(alunoLogado.assinaturaAtiva ? 'Informativo reativado.' : 'Informativo desativado.', 'info');
+                    renderizarEventosAluno();
+                } else {
+                    toast(mensagemDeErro(r, 'Não foi possível alterar a assinatura.'), 'erro');
+                }
+            } catch (erro) {
+                toast('Não foi possível falar com o servidor.', 'erro');
+            }
+            renderizarAssinatura();
+        }
+
+        // Cancelamento direto, sem entrar na conta (é o que o e-mail semanal pede)
+        async function cancelarAssinatura(e) {
+            e.preventDefault();
+            const btn = $('btn-cancelar-assinatura');
+            aviso('status-cancelar', '');
+            btn.disabled = true;
+            const email = $('cancelar-email').value.trim().toLowerCase();
+            const senha = $('cancelar-senha').value;
+            try {
+                const r = await api('/assinaturas/cancelar', { metodo: 'POST', corpo: { email, senha } });
+                $('cancelar-senha').value = '';
+                if (r.ok) {
+                    aviso('status-cancelar', 'Pronto! Você não receberá mais o informativo semanal.', 'ok');
+                    toast('Assinatura cancelada.', 'info');
+                    $('cancelar-email').value = '';
+                    if (alunoLogado && alunoLogado.email === email) {
+                        alunoLogado = { ...alunoLogado, assinaturaAtiva: false };
+                        renderizarAssinatura();
+                        renderizarEventosAluno();
+                    }
+                } else if (r.status === 401) {
+                    aviso('status-cancelar', 'E-mail ou senha inválidos.');
+                } else {
+                    aviso('status-cancelar', mensagemDeErro(r));
+                }
+            } catch (erro) {
+                aviso('status-cancelar', 'Não foi possível falar com o servidor. Ele está rodando?');
+            } finally {
+                btn.disabled = false;
+            }
         }
 
         /* ---------- Login / logout do administrador ---------- */
@@ -772,11 +900,13 @@
                     mudarVisao('admin');
                 } else if (r.bloqueado) {
                     mostrarErroAdmin(`Muitas tentativas. Aguarde ${Auth.segundosBloqueado()} segundos para tentar novamente.`);
+                } else if (r.semPermissao) {
+                    mostrarErroAdmin('Este usuário não tem permissão de administrador.');
                 } else {
                     mostrarErroAdmin(`Usuário ou senha inválidos. Restam ${r.restantes} tentativa(s).`);
                 }
             } catch (err) {
-                mostrarErroAdmin('Não foi possível validar o login neste ambiente. Abra a página via localhost ou https.');
+                mostrarErroAdmin('Não foi possível falar com o servidor. Ele está rodando?');
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Entrar no painel';
@@ -787,7 +917,6 @@
             Auth.sair();
             limparAdmin();
             fecharModal();
-            fecharModalExcluir();
             mudarVisao('aluno');
             toast('Sessão do gestor encerrada.', 'info');
         }
@@ -797,7 +926,6 @@
             if (Auth.ativo()) return true;
             toast('Sessão expirada ou não autorizada. Faça login novamente.', 'erro');
             fecharModal();
-            fecharModalExcluir();
             mudarVisao('login-admin');
             return false;
         }
@@ -808,28 +936,39 @@
             $('admin-stats').innerHTML = '';
         }
 
+        async function carregarEventosAdmin() {
+            try {
+                const r = await api('/eventos');
+                if (!r.ok) throw new Error('status ' + r.status);
+                eventosAdmin = r.dados.map(mapearEvento);
+                renderizarAdmin();
+            } catch (erro) {
+                toast('Não foi possível carregar os eventos do servidor.', 'erro');
+            }
+        }
+
         function renderizarAdmin() {
             if (!Auth.ativo()) return;
 
-            const totalHoras = eventosMemoria.reduce((s, e) => s + horasNumericas(e), 0);
+            const totalHoras = eventosAdmin.reduce((s, e) => s + horasNumericas(e), 0);
             const stat = (icone, cor, valor, rotulo) => `
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl ${cor} flex items-center justify-center"><i class="fa-solid ${icone} text-lg"></i></div>
                     <div><p class="text-2xl font-extrabold text-slate-900 leading-none">${valor}</p><p class="text-sm text-slate-500 mt-1">${rotulo}</p></div>
                 </div>`;
             $('admin-stats').innerHTML =
-                stat('fa-calendar-check', 'bg-blue-50 text-blue-700', eventosMemoria.length, 'Eventos publicados') +
+                stat('fa-calendar-check', 'bg-blue-50 text-blue-700', eventosAdmin.length, 'Eventos cadastrados') +
                 stat('fa-clock', 'bg-emerald-50 text-emerald-700', totalHoras + 'h', 'Horas complementares ofertadas') +
-                stat('fa-users', 'bg-amber-50 text-amber-700', inscricoesMemoria.length, 'Inscrições em eventos');
+                stat('fa-building-columns', 'bg-amber-50 text-amber-700', instituicoes.length, 'Instituições');
 
-            if (!eventosMemoria.length) {
+            if (!eventosAdmin.length) {
                 const vazio = `<div class="text-center py-10 text-slate-500 text-sm">Nenhum evento cadastrado. Use <strong>Novo evento</strong> para começar.</div>`;
                 $('tabela-admin-body').innerHTML = `<tr><td colspan="4">${vazio}</td></tr>`;
                 $('lista-admin-mobile').innerHTML = vazio;
                 return;
             }
 
-            $('tabela-admin-body').innerHTML = eventosMemoria.map(ev => {
+            $('tabela-admin-body').innerHTML = eventosAdmin.map(ev => {
                 const { tipo, horas } = partirCategoria(ev);
                 return `
                 <tr class="hover:bg-slate-50 transition">
@@ -839,14 +978,11 @@
                         ${horas ? `<span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full ml-1">${esc(horas)}</span>` : ''}
                     </td>
                     <td class="py-4 px-4 text-slate-600 whitespace-nowrap">${esc(ev.data)}</td>
-                    <td class="py-4 px-4 text-right whitespace-nowrap">
-                        <button type="button" onclick="abrirModalEditar(${ev.id})" class="w-9 h-9 rounded-lg text-blue-600 hover:bg-blue-50 transition" aria-label="Editar ${esc(ev.titulo)}"><i class="fa-solid fa-pen"></i></button>
-                        <button type="button" onclick="pedirExclusao(${ev.id})" class="w-9 h-9 rounded-lg text-red-600 hover:bg-red-50 transition" aria-label="Excluir ${esc(ev.titulo)}"><i class="fa-solid fa-trash"></i></button>
-                    </td>
+                    <td class="py-4 px-4 text-slate-600">${esc(ev.local)}</td>
                 </tr>`;
             }).join('');
 
-            $('lista-admin-mobile').innerHTML = eventosMemoria.map(ev => {
+            $('lista-admin-mobile').innerHTML = eventosAdmin.map(ev => {
                 const { tipo, horas } = partirCategoria(ev);
                 return `
                 <div class="border border-slate-200 rounded-xl p-4">
@@ -856,16 +992,17 @@
                         ${horas ? `<span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">${esc(horas)}</span>` : ''}
                     </div>
                     <p class="text-sm text-slate-600 mt-2 flex items-center gap-2"><i class="fa-regular fa-calendar text-blue-600"></i> ${esc(ev.data)}</p>
-                    <div class="grid grid-cols-2 gap-2 mt-4">
-                        <button type="button" onclick="abrirModalEditar(${ev.id})" class="py-2.5 rounded-lg bg-blue-50 text-blue-700 text-sm font-semibold"><i class="fa-solid fa-pen"></i> Editar</button>
-                        <button type="button" onclick="pedirExclusao(${ev.id})" class="py-2.5 rounded-lg bg-red-50 text-red-700 text-sm font-semibold"><i class="fa-solid fa-trash"></i> Excluir</button>
-                    </div>
+                    <p class="text-sm text-slate-600 mt-1 flex items-center gap-2"><i class="fa-solid fa-location-dot text-blue-600"></i> ${esc(ev.local)}</p>
                 </div>`;
             }).join('');
         }
 
-        /* ---------- Modais e CRUD ---------- */
-        function abrirModal() {
+        /* ---------- Modal de novo evento (POST /api/eventos) ---------- */
+        function abrirModalCriar() {
+            if (!exigirAdmin()) return;
+            $('form-evento-admin').reset();
+            aviso('erro-evento', '');
+            preencherInstituicoes();
             const m = $('modal-evento');
             m.classList.remove('hidden');
             m.classList.add('flex');
@@ -878,106 +1015,64 @@
             m.classList.remove('flex');
         }
 
-        function abrirModalCriar() {
-            if (!exigirAdmin()) return;
-            $('form-evento-admin').reset();
-            $('evento-id').value = '';
-            $('modal-titulo').textContent = 'Adicionar novo evento';
-            abrirModal();
-        }
-
-        function abrirModalEditar(id) {
-            if (!exigirAdmin()) return;
-            const ev = eventosMemoria.find(x => x.id === id);
-            if (!ev) return;
-            $('evento-id').value = ev.id;
-            $('adm-titulo').value = ev.titulo;
-            $('adm-categoria').value = ev.categoria;
-            $('adm-data').value = ev.data;
-            $('adm-descricao').value = ev.descricao;
-            $('modal-titulo').textContent = 'Editar evento';
-            abrirModal();
-        }
-
-        function salvarEventoAdmin(e) {
+        async function salvarEventoAdmin(e) {
             e.preventDefault();
             if (!exigirAdmin()) return;
+            const btn = $('btn-salvar-evento');
+            aviso('erro-evento', '');
+            btn.disabled = true;
 
-            const dados = {
-                titulo: $('adm-titulo').value.trim(),
+            let dataHora = $('adm-data').value;               // "2026-12-01T19:00"
+            if (dataHora.length === 16) dataHora += ':00';    // LocalDateTime com segundos
+            const corpo = {
+                nome: $('adm-titulo').value.trim(),
+                descricao: $('adm-descricao').value.trim(),
+                local: $('adm-local').value.trim(),
+                dataHora,
                 categoria: $('adm-categoria').value.trim(),
-                data: $('adm-data').value.trim(),
-                descricao: $('adm-descricao').value.trim()
+                cargaHoraria: Number($('adm-horas').value),
+                instituicaoId: Number($('adm-instituicao').value)
             };
-            const idAtual = parseInt($('evento-id').value, 10);
 
-            if (idAtual) {
-                const ev = eventosMemoria.find(x => x.id === idAtual);
-                if (ev) Object.assign(ev, dados);
-                toast('Evento atualizado.');
-            } else {
-                const novoId = eventosMemoria.reduce((m, x) => Math.max(m, x.id), 0) + 1;
-                eventosMemoria.push({ id: novoId, ...dados });
-                toast('Evento criado.');
+            try {
+                const r = await api('/eventos', { metodo: 'POST', corpo, autorizacao: Auth.autorizacao() });
+                if (r.ok) {
+                    toast('Evento criado e salvo no banco.');
+                    fecharModal();
+                    await carregarEventosAdmin();
+                    await carregarEventos();
+                } else if (r.status === 401 || r.status === 403) {
+                    Auth.sair();
+                    fecharModal();
+                    toast('Sessão não autorizada. Entre novamente como gestor.', 'erro');
+                    atualizarNavAdmin();
+                    mudarVisao('login-admin');
+                } else {
+                    aviso('erro-evento', mensagemDeErro(r, 'Não foi possível salvar o evento.'));
+                }
+            } catch (erro) {
+                aviso('erro-evento', 'Não foi possível falar com o servidor. Ele está rodando?');
+            } finally {
+                btn.disabled = false;
             }
-            fecharModal();
-            renderizarAdmin();
-            renderizarEventosAluno();
-        }
-
-        function pedirExclusao(id) {
-            if (!exigirAdmin()) return;
-            const ev = eventosMemoria.find(x => x.id === id);
-            if (!ev) return;
-            idParaExcluir = id;
-            $('excluir-texto').textContent = `"${ev.titulo}" será removido do sistema e das inscrições dos alunos.`;
-            const m = $('modal-excluir');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-        }
-
-        function fecharModalExcluir() {
-            const m = $('modal-excluir');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
-            idParaExcluir = null;
-        }
-
-        function confirmarExclusao() {
-            if (!exigirAdmin()) return;
-            eventosMemoria = eventosMemoria.filter(x => x.id !== idParaExcluir);
-            inscricoesMemoria = inscricoesMemoria.filter(i => i.eventoId !== idParaExcluir);
-            fecharModalExcluir();
-            renderizarAdmin();
-            renderizarEventosAluno();
-            toast('Evento excluído.', 'info');
         }
 
         /* ---------- Teclado e cliques fora ---------- */
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Escape') return;
             fecharModal();
-            fecharModalExcluir();
             alternarMenu(true);
         });
-        ['modal-evento', 'modal-excluir'].forEach(id => {
-            $(id).addEventListener('click', (e) => {
-                if (e.target.id === id) { id === 'modal-evento' ? fecharModal() : fecharModalExcluir(); }
-            });
-        });
-
-        /* ---------- Máscara simples de telefone ---------- */
-        $('whatsapp').addEventListener('input', (e) => {
-            let v = e.target.value.replace(/\D/g, '').slice(0, 11);
-            if (v.length > 6) v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
-            else if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`;
-            e.target.value = v;
+        $('modal-evento').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-evento') fecharModal();
         });
 
         /* ---------- Inicialização ---------- */
         renderizarEventosAluno();
         atualizarEstadoAluno();
         mudarVisao('aluno');
+        carregarInstituicoes();
+        carregarEventos();
         window.scrollTo(0, 0);
     </script>
 </body>
